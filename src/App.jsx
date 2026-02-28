@@ -93,7 +93,7 @@ export default function App() {
             fontWeight: '700',
             color: 'var(--color-gold)',
           }}>
-            Jaap Ledger
+            Sumiran
           </h1>
           <button
             onClick={() => setShowSettings(true)}
