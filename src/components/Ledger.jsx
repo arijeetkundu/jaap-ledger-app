@@ -80,7 +80,6 @@ async function handleUpdate() {
         }}
       >
         {/* Expand Arrow */}
-        {/* Expand Arrow */}
         <div style={{
           width: 16,
           fontSize: '0.65rem',
@@ -125,7 +124,7 @@ async function handleUpdate() {
 
         {/* Count */}
         <div style={{
-          fontFamily: 'var(--font-serif)',
+          fontFamily: 'var(--font-sans)',
           fontSize: '1rem',
           fontWeight: '600',
           color: isEmpty
@@ -229,7 +228,7 @@ async function handleUpdate() {
               Jaap Count
             </div>
             <div style={{
-              fontFamily: 'var(--font-serif)',
+              fontFamily: 'var(--font-sans)',
               fontSize: '1.2rem',
               fontWeight: '600',
               color: 'var(--color-text-primary)',
@@ -304,7 +303,7 @@ function YearGroup({ yearData, isOpen, onToggle, onUpdate, expandedDate, onRowTo
             ▶
           </span>
           <span style={{
-            fontFamily: 'var(--font-serif)',
+            fontFamily: 'var(--font-sans)',
             fontSize: '1.1rem',
             fontWeight: '700',
             color: 'var(--color-gold)'
@@ -313,7 +312,7 @@ function YearGroup({ yearData, isOpen, onToggle, onUpdate, expandedDate, onRowTo
           </span>
         </div>
         <span style={{
-          fontFamily: 'var(--font-serif)',
+          fontFamily: 'var(--font-sans)',
           fontSize: '1rem',
           fontWeight: '600',
           color: 'var(--color-gold)'

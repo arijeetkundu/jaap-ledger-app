@@ -33,7 +33,7 @@ export default function ReflectionCard({ entries }) {
           Lifetime Jaap
         </div>
         <div style={{
-          fontFamily: 'var(--font-serif)',
+          fontFamily: 'var(--font-sans)',
           fontSize: '2.2rem',
           fontWeight: '700',
           color: 'var(--color-gold-bright)',
@@ -56,7 +56,7 @@ export default function ReflectionCard({ entries }) {
           {currentYear} Total
         </div>
         <div style={{
-          fontFamily: 'var(--font-serif)',
+          fontFamily: 'var(--font-sans)',
           fontSize: '1.4rem',
           fontWeight: '600',
           color: 'var(--color-text-primary)'
@@ -130,7 +130,7 @@ export default function ReflectionCard({ entries }) {
               }}>
                 <span style={{ fontSize: '1rem' }}>🪔</span>
                 <span style={{
-                  fontFamily: 'var(--font-serif)',
+                  fontFamily: 'var(--font-sans)',
                   fontWeight: '600',
                   color: 'var(--color-gold)'
                 }}>

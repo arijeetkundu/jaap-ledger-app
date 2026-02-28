@@ -38,7 +38,7 @@ export default function TodayCard({ todayEntry, onSave }) {
       <div style={{ marginBottom: 'var(--spacing-lg)' }}>
         <div className="card-label">Today</div>
         <div style={{
-          fontFamily: 'var(--font-serif)',
+          fontFamily: 'var(--font-sans)',
           fontSize: '1.1rem',
           fontWeight: '600',
           color: 'var(--color-text-card)'
