@@ -1,0 +1,276 @@
+/* ============================================
+   JAAP LEDGER — MIDNIGHT SANCTUM DESIGN SYSTEM
+   ============================================ */
+
+:root {
+  /* Core Palette */
+  --color-bg:              #0B1628;
+  --color-card:            #F0F4FF;
+  --color-card-alt:        #E8EDF8;
+  --color-text-primary:    #EEE8D5;
+  --color-text-card:       #0B1628;
+  --color-text-muted:      #A89060;
+  --color-text-subtle:     #8899AA;
+
+  /* Gold Accents */
+  --color-gold:            #C9A84C;
+  --color-gold-bright:     #F0C040;
+  --color-gold-track:      #1E3050;
+
+  /* Semantic */
+  --color-sunday:          #C0392B;
+  --color-locked:          #8899AA;
+  --color-border:          rgba(201, 168, 76, 0.2);
+  --color-shadow:          rgba(0, 0, 0, 0.4);
+
+  /* Typography */
+  --font-serif:            'Playfair Display', Georgia, serif;
+  --font-sans:             'Inter', system-ui, sans-serif;
+
+  /* Spacing */
+  --spacing-xs:            4px;
+  --spacing-sm:            8px;
+  --spacing-md:            16px;
+  --spacing-lg:            24px;
+  --spacing-xl:            32px;
+
+  /* Radius */
+  --radius-sm:             8px;
+  --radius-md:             12px;
+  --radius-lg:             16px;
+
+  /* Transitions */
+  --transition-fast:       0.15s ease;
+  --transition-smooth:     0.3s ease;
+}
+
+/* ============================================
+   SACRED SAFFRON PALETTE
+   ============================================ */
+[data-palette="sacred-saffron"] {
+  --color-bg:              #1A0A0A;
+  --color-card:            #FFF8F0;
+  --color-card-alt:        #F5EDE0;
+  --color-text-primary:    #F5E6C8;
+  --color-text-card:       #1A0A0A;
+  --color-text-muted:      #C4882A;
+  --color-text-subtle:     #996633;
+
+  --color-gold:            #E8820A;
+  --color-gold-bright:     #FF9F1C;
+  --color-gold-track:      #3D1A08;
+
+  --color-sunday:          #C0392B;
+  --color-locked:          #996633;
+  --color-border:          rgba(232, 130, 10, 0.25);
+  --color-shadow:          rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================
+   FOREST ASHRAM PALETTE
+   ============================================ */
+[data-palette="forest-ashram"] {
+  --color-bg:              #0A1A0F;
+  --color-card:            #F0F5F0;
+  --color-card-alt:        #E4EDE4;
+  --color-text-primary:    #D4E8C8;
+  --color-text-card:       #0A1A0F;
+  --color-text-muted:      #7A9E5A;
+  --color-text-subtle:     #5A7A4A;
+
+  --color-gold:            #B8A830;
+  --color-gold-bright:     #D4C840;
+  --color-gold-track:      #162A10;
+
+  --color-sunday:          #C0392B;
+  --color-locked:          #5A7A4A;
+  --color-border:          rgba(184, 168, 48, 0.25);
+  --color-shadow:          rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-gold-track);
+  border-radius: 3px;
+}
+
+/* ============================================
+   APP LAYOUT
+   ============================================ */
+
+#root {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--spacing-md);
+  padding-bottom: 80px;
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+
+.font-serif   { font-family: var(--font-serif); }
+.font-sans    { font-family: var(--font-sans); }
+.text-gold    { color: var(--color-gold); }
+.text-muted   { color: var(--color-text-muted); }
+.text-sunday  { color: var(--color-sunday); }
+
+/* ============================================
+   CARDS
+   ============================================ */
+
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  box-shadow: 0 4px 24px var(--color-shadow);
+  color: var(--color-text-card);
+}
+
+.card-label {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+/* ============================================
+   INPUTS
+   ============================================ */
+
+.input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  background: white;
+  color: var(--color-text-card);
+  transition: border-color var(--transition-fast);
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+}
+
+.input-number {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+textarea.input {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-fast);
+}
+
+.btn-primary {
+  background: var(--color-gold);
+  color: var(--color-bg);
+}
+
+.btn-primary:hover {
+  background: var(--color-gold-bright);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* ============================================
+   PROGRESS BAR
+   ============================================ */
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  background: var(--color-gold-track);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: var(--spacing-sm) 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-gold), var(--color-gold-bright));
+  border-radius: 4px;
+  transition: width var(--transition-smooth);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50%       { transform: scale(1.08); opacity: 1; }
+}
