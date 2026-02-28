@@ -42,6 +42,9 @@
   /* Transitions */
   --transition-fast:       0.15s ease;
   --transition-smooth:     0.3s ease;
+
+  /* Background Pattern */
+  --bg-pattern: url('/bg-midnight-sanctum.png');
 }
 
 /* ============================================
@@ -64,6 +67,8 @@
   --color-locked:          #996633;
   --color-border:          rgba(232, 130, 10, 0.25);
   --color-shadow:          rgba(0, 0, 0, 0.5);
+
+  --bg-pattern:            url('/bg-sacred-saffron.png');
 }
 
 /* ============================================
@@ -86,6 +91,8 @@
   --color-locked:          #5A7A4A;
   --color-border:          rgba(184, 168, 48, 0.25);
   --color-shadow:          rgba(0, 0, 0, 0.5);
+
+  --bg-pattern:            url('/bg-forest-ashram.png');
 }
 
 /* ============================================
@@ -112,6 +119,19 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: var(--bg-pattern);
+  background-repeat: repeat;
+  background-size: 50vw auto;
+  background-attachment: fixed;
+  opacity: 0.28;
+  z-index: 0;
+  pointer-events: none;
+}
+
 /* ============================================
    SCROLLBAR
    ============================================ */
@@ -136,6 +156,8 @@ body {
   margin: 0 auto;
   padding: var(--spacing-md);
   padding-bottom: 80px;
+  position: relative;
+  z-index: 1;
 }
 
 /* ============================================
