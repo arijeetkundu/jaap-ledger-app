@@ -9,9 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['deity.png', 'favicon.ico'],
       manifest: {
-        name: 'Jaap Ledger',
-        short_name: 'Jaap Ledger',
-        description: 'Daily chanting practice tracker',
+        name: 'Sumiran',
+        short_name: 'Sumiran',
+        description: 'सुमिरन — Daily chanting practice tracker',
         theme_color: '#0B1628',
         background_color: '#0B1628',
         display: 'standalone',

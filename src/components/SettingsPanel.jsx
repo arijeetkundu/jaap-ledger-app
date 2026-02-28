@@ -476,7 +476,7 @@ export default function SettingsPanel({ onClose, onImportComplete }) {
           fontSize: '0.75rem',
           color: 'var(--color-text-subtle)'
         }}>
-          Jaap Ledger v1.0.0 · Built with 🙏
+          Sumiran v1.0.0 · Built with 🙏
         </div>
       </div>
     </>

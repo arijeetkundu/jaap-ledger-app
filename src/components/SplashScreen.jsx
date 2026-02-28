@@ -97,7 +97,7 @@ export default function SplashScreen({ onComplete }) {
           marginBottom: 8,
           textShadow: '0 0 40px rgba(240,192,64,0.3)'
         }}>
-          Jaap Ledger
+          Sumiran
         </div>
         <div style={{
           fontFamily: 'var(--font-sans)',
@@ -106,7 +106,7 @@ export default function SplashScreen({ onComplete }) {
           letterSpacing: '0.15em',
           textTransform: 'uppercase'
         }}>
-          Daily Practice Tracker
+          सुमिरन · Daily Practice Tracker
         </div>
       </div>
 

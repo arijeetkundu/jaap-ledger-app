@@ -61,7 +61,7 @@ export default function App() {
         fontFamily: 'var(--font-serif)',
         fontSize: '1.2rem'
       }}>
-        Loading Jaap Ledger...
+        Loading Sumiran...
       </div>
     )
   }
