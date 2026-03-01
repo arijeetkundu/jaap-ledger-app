@@ -1,3 +1,16 @@
+// ── DEV ONLY: set to override today's date for testing ──────────────────────
+// Format: new Date(year, monthIndex, day, hour, minute, second)
+// Remove this before merging to main.
+const DEV_DATE_OVERRIDE = null
+//const DEV_DATE_OVERRIDE = new Date(2025, 11, 31, 12, 0, 0) // Dec 31 2025
+//const DEV_DATE_OVERRIDE = new Date(2026, 0, 5, 12, 0, 0)  // Jan 5 2026 (inside window)
+//const DEV_DATE_OVERRIDE = new Date(2026, 0, 13, 22, 0, 0) // Jan 13 2026 (last hour)
+//const DEV_DATE_OVERRIDE = new Date(2026, 0, 14, 1, 0, 0)  // Jan 14 2026 (expired)
+
+function now() {
+  return DEV_DATE_OVERRIDE || new Date()
+}
+
 /**
  * antaryatraLogic.js
  * Pure logic for Antaryātrā annual reflection windows.
@@ -10,38 +23,28 @@
  *   Closes: Jan 13 of Y+1 at 23:59:59 local
  */
 export function getReflectionWindow(year) {
-  const opens = new Date(year, 11, 31, 0, 0, 0)       // Dec 31, Y
-  const closes = new Date(year + 1, 0, 13, 23, 59, 59) // Jan 13, Y+1
+  const opens = new Date(year, 11, 31, 0, 0, 0)
+  const closes = new Date(year + 1, 0, 13, 23, 59, 59)
   return { opens, closes }
 }
 
-/**
- * Returns true if today is within the reflection window for year Y.
- */
 export function isWindowOpen(year) {
-  const now = new Date()
+  const current = now()
   const { opens, closes } = getReflectionWindow(year)
-  return now >= opens && now <= closes
+  return current >= opens && current <= closes
 }
 
-/**
- * Returns true if the reflection window for year Y has expired
- * (i.e. we are past Jan 13 of Y+1).
- */
 export function isWindowExpired(year) {
-  const now = new Date()
+  const current = now()
   const { closes } = getReflectionWindow(year)
-  return now > closes
+  return current > closes
 }
 
-/**
- * Returns true if today is Dec 31 of the given year (local time).
- */
 export function isReflectionDay(year) {
-  const now = new Date()
-  return now.getFullYear() === year &&
-    now.getMonth() === 11 &&
-    now.getDate() === 31
+  const current = now()
+  return current.getFullYear() === year &&
+    current.getMonth() === 11 &&
+    current.getDate() === 31
 }
 
 /**
@@ -85,10 +88,10 @@ export function canRecord(record, year) {
  * Returns today's date as YYYY-MM-DD in local timezone.
  */
 export function getLocalDateString() {
-  const now = new Date()
-  const y = now.getFullYear()
-  const m = String(now.getMonth() + 1).padStart(2, '0')
-  const d = String(now.getDate()).padStart(2, '0')
+  const current = now()
+  const y = current.getFullYear()
+  const m = String(current.getMonth() + 1).padStart(2, '0')
+  const d = String(current.getDate()).padStart(2, '0')
   return `${y}-${m}-${d}`
 }
 
