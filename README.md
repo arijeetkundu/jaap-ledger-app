@@ -13,11 +13,30 @@
 - **Ledger** — A complete history of your practice, grouped by year. Sundays highlighted in crimson. Editable within 7 days.
 - **Milestones** — Every Crore (1,00,00,000) is celebrated with the date achieved and days since the previous milestone.
 - **Prediction** — Based on your 30-day average, Sumiran predicts when you'll reach your next Crore.
+- **Sankalpa Layer** — A single, sacred, immutable record of the intent with which your sādhanā began. Not a goal. A remembrance.
 - **Import** — Bring in years of past data from a JSON or CSV file.
 - **Export** — Download your complete data as JSON or CSV backup anytime.
 - **Colour Palettes** — Three devotional themes: Midnight Sanctum, Sacred Saffron, Forest Ashram.
 - **Offline First** — Works completely without internet after first load.
 - **Indian Number Format** — All counts displayed in Indian format (1,00,00,000).
+
+---
+
+## 🕯️ Sankalpa Layer
+
+> *Ledgers count effort. Sankalpa anchors intent.*
+
+Most spiritual apps track what you did. Sumiran also preserves why you began.
+
+The Sankalpa Layer is a single sacred record — set once, enduring always — that lives quietly behind the ledger. It records:
+
+- **Sankalpa text** — your vow of intent, in your own words
+- **Context** — Guru, Devatā, or occasion (optional)
+- **Date of Sankalpa** — automatically recorded, never editable
+
+It is not shown loudly. It does not alter any count or progress bar. It simply holds the foundation of your practice — the way a monastery keeps its founding vow, or a lineage preserves its initiation records.
+
+Changing a Sankalpa requires deliberate confirmation — a moment of pause that mirrors the gravity of rewriting a vow.
 
 ---
 
@@ -50,7 +69,7 @@ Sumiran is a PWA — it can be installed on any device like a native app.
 | Layer | Technology |
 |---|---|
 | Framework | React + Vite |
-| Database | IndexedDB (offline, browser-local) |
+| Database | IndexedDB v2 (entries + sankalpa stores) |
 | PWA | vite-plugin-pwa + Workbox |
 | Unit Testing | Vitest + React Testing Library |
 | E2E Testing | Playwright |
@@ -129,17 +148,18 @@ sumiran/
 │   │   ├── ReflectionCard.jsx       # Lifetime stats & milestones
 │   │   ├── Ledger.jsx               # Historical entries
 │   │   ├── SplashScreen.jsx         # App launch screen
-│   │   └── SettingsPanel.jsx        # Import, export, palette
+│   │   ├── SettingsPanel.jsx        # Import, export, palette, sankalpa entry
+│   │   └── SankalpePage.jsx         # Sacred Sankalpa full-screen page
 │   ├── logic/
 │   │   ├── formatIndianNumber.js    # Indian number formatting
 │   │   ├── milestoneLogic.js        # Crore milestones & prediction
 │   │   ├── ledgerLogic.js           # Date filling, Sunday detection
 │   │   └── palette.js               # Colour palette management
 │   ├── db/
-│   │   └── db.js                    # IndexedDB service
+│   │   └── db.js                    # IndexedDB service (v2)
 │   └── tests/
 │       ├── unit/                    # Vitest unit tests (36 tests)
-│       └── e2e/                     # Playwright E2E tests (14 tests)
+│       └── e2e/                     # Playwright E2E tests (21 tests)
 ├── vite.config.js                   # Vite + PWA + Vitest config
 └── playwright.config.js             # Playwright config
 ```
@@ -150,9 +170,9 @@ sumiran/
 
 ```
 Unit Tests      36 passing  ✅
-E2E Tests       14 passing  ✅
+E2E Tests       21 passing  ✅
 ─────────────────────────────
-Total           50 passing  ✅
+Total           57 passing  ✅
 ```
 
 Tests cover:
@@ -164,6 +184,7 @@ Tests cover:
 - Settings — open, export, palette, close (4 tests)
 - Ledger — year display, TODAY badge, Sunday colours (3 tests)
 - Palette — change and persist (2 tests)
+- Sankalpa — open, intro text, establish, read-only, rewrite warning, back navigation (7 tests)
 
 ---
 
@@ -189,6 +210,18 @@ Sumiran accepts JSON files in the following format:
 
 ### Export Format
 Exports include all entries with `date`, `count`, `notes` and `updatedAt` fields.
+
+### Sankalpa Record
+Stored internally in IndexedDB under key `primary` in the `sankalpa` store:
+```json
+{
+  "id": "primary",
+  "text": "May every jaap be offered at the feet of Śrī Rāma...",
+  "context": "Hanumān-ji, Guru Kripā",
+  "date": "2026-03-01",
+  "updatedAt": "2026-03-01"
+}
+```
 
 ---
 
