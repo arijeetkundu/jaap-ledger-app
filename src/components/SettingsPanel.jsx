@@ -1,11 +1,13 @@
 import { useState, useRef } from 'react'
 import { getAllEntries, saveEntry } from '../db/db'
 import { PALETTES, getSavedPalette, savePalette } from '../logic/palette'
+import SankalpePage from './SankalpePage'
 
 export default function SettingsPanel({ onClose, onImportComplete }) {
   const [importStatus, setImportStatus] = useState(null) // null | 'importing' | 'success' | 'error'
   const [importMessage, setImportMessage] = useState('')
   const [currentPalette, setCurrentPalette] = useState(getSavedPalette())
+  const [showSankalpa, setShowSankalpa] = useState(false)
   const jsonInputRef = useRef()
   const csvInputRef = useRef()
 
@@ -173,6 +175,10 @@ export default function SettingsPanel({ onClose, onImportComplete }) {
 
   return (
     <>
+      {showSankalpa && (
+        <SankalpePage onClose={() => setShowSankalpa(false)} />
+      )}
+
       {/* Backdrop */}
       <div
         onClick={onClose}
@@ -232,8 +238,44 @@ export default function SettingsPanel({ onClose, onImportComplete }) {
             ×
           </button>
         </div>
+        
+        {/* ── SANKALPA ENTRY ── */}
+        <div
+          onClick={() => setShowSankalpa(true)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px 0',
+            borderBottom: '1px solid var(--color-border)',
+            marginBottom: 'var(--spacing-xl)',
+            cursor: 'pointer'
+          }}
+        >
+          <div>
+            <div style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: '1rem',
+              color: 'var(--color-gold)',
+              marginBottom: 3
+            }}>
+              Sankalpa
+            </div>
+            <div style={{
+              fontSize: '0.75rem',
+              color: 'var(--color-text-muted)',
+              fontStyle: 'italic'
+            }}>
+              A vow of intent
+            </div>
+          </div>
+          <div style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>
+            →
+          </div>
+        </div>
 
         {/* ── EXPORT SECTION ── */}
+
         <div style={{ marginBottom: 'var(--spacing-xl)' }}>
           <div className="card-label" style={{
             color: 'var(--color-gold)',
