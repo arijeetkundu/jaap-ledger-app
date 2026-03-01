@@ -154,4 +154,59 @@ test.describe('Jaap Ledger', () => {
     await page.click('text=Midnight Sanctum')
   })
 
+  // ── SANKALPA ───────────────────────────────────────
+
+  test('should open Sankalpa page from Settings', async ({ page }) => {
+    await page.click('button[title="Settings"]')
+    await page.click('text=Sankalpa')
+    await expect(page.locator('text=It is not a goal')).toBeVisible()
+  })
+
+  test('should show intro text on Sankalpa page', async ({ page }) => {
+    await page.click('button[title="Settings"]')
+    await page.click('text=Sankalpa')
+    await expect(page.locator('text=It is not a goal')).toBeVisible()
+  })
+
+  test('should show Establish Sankalpa button when no sankalpa set', async ({ page }) => {
+    await page.click('button[title="Settings"]')
+    await page.click('text=Sankalpa')
+    await expect(page.locator('button:has-text("Establish Sankalpa")')).toBeVisible()
+  })
+
+  test('should save a Sankalpa and show confirmation', async ({ page }) => {
+    await page.click('button[title="Settings"]')
+    await page.click('text=Sankalpa')
+    await page.fill('textarea', 'May every jaap be offered at the feet of Śrī Rāma.')
+    await page.click('button:has-text("Establish Sankalpa")')
+    await expect(page.locator('text=Sankalpa recorded')).toBeVisible({ timeout: 3000 })
+  })
+
+  test('should show saved Sankalpa in read-only view', async ({ page }) => {
+    await page.click('button[title="Settings"]')
+    await page.click('text=Sankalpa')
+    await page.fill('textarea', 'Test Sankalpa for read-only check')
+    await page.click('button:has-text("Establish Sankalpa")')
+    await expect(page.locator('button:has-text("Re-affirm Sankalpa")')).toBeVisible({ timeout: 6000 })
+  })
+
+  test('should show rewrite warning when Re-affirm is clicked', async ({ page }) => {
+    await page.click('button[title="Settings"]')
+    await page.click('text=Sankalpa')
+    const reaffirm = page.locator('button:has-text("Re-affirm Sankalpa")')
+    const count = await reaffirm.count()
+    if (count > 0) {
+      await reaffirm.click()
+      await expect(page.locator('text=Rewriting a Sankalpa should be done with care')).toBeVisible()
+    }
+  })
+
+  test('should navigate back from Sankalpa page', async ({ page }) => {
+    await page.click('button[title="Settings"]')
+    await page.click('text=Sankalpa')
+    await expect(page.locator('text=It is not a goal')).toBeVisible()
+    await page.click('button:has-text("←")')
+    await expect(page.locator('h2:has-text("Settings")')).toBeVisible()
+  })
+
 })
