@@ -2,12 +2,14 @@ import { useState, useRef } from 'react'
 import { getAllEntries, saveEntry } from '../db/db'
 import { PALETTES, getSavedPalette, savePalette } from '../logic/palette'
 import SankalpePage from './SankalpePage'
+import AntaryatraArchivePage from './AntaryatraArchivePage'
 
-export default function SettingsPanel({ onClose, onImportComplete }) {
+export default function SettingsPanel({ onClose, onImportComplete, allEntries }) {
   const [importStatus, setImportStatus] = useState(null) // null | 'importing' | 'success' | 'error'
   const [importMessage, setImportMessage] = useState('')
   const [currentPalette, setCurrentPalette] = useState(getSavedPalette())
   const [showSankalpa, setShowSankalpa] = useState(false)
+  const [showArchive, setShowArchive] = useState(false)
   const jsonInputRef = useRef()
   const csvInputRef = useRef()
 
@@ -179,6 +181,13 @@ export default function SettingsPanel({ onClose, onImportComplete }) {
         <SankalpePage onClose={() => setShowSankalpa(false)} />
       )}
 
+      {showArchive && (
+        <AntaryatraArchivePage
+          onClose={() => setShowArchive(false)}
+          allEntries={allEntries}
+        />
+      )}
+
       {/* Backdrop */}
       <div
         onClick={onClose}
@@ -272,6 +281,35 @@ export default function SettingsPanel({ onClose, onImportComplete }) {
           <div style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>
             →
           </div>
+        </div>
+
+        {/* ── ANTARYĀTRĀ ARCHIVE ENTRY ── */}
+        <div
+          onClick={() => setShowArchive(true)}
+          style={{
+            display: 'flex', alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '16px 0',
+            borderBottom: '1px solid var(--color-border)',
+            marginBottom: 'var(--spacing-xl)',
+            cursor: 'pointer'
+          }}
+        >
+          <div>
+            <div style={{
+              fontFamily: 'var(--font-serif)', fontSize: '1rem',
+              color: 'var(--color-gold)', marginBottom: 3
+            }}>
+              Antaryātrā
+            </div>
+            <div style={{
+              fontSize: '0.75rem', color: 'var(--color-text-muted)',
+              fontStyle: 'italic'
+            }}>
+              Annual Reflections
+            </div>
+          </div>
+          <div style={{ color: 'var(--color-text-muted)', fontSize: '1.1rem' }}>→</div>
         </div>
 
         {/* ── EXPORT SECTION ── */}

@@ -76,6 +76,7 @@ export default function App() {
             loadAll()
             setShowSettings(false)
           }}
+          allEntries={entries}
         />
       )}
       <div id="app">

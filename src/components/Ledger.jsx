@@ -1,7 +1,10 @@
 import { saveEntry } from '../db/db'
 import { isSunday, groupEntriesByYear, getLocalToday } from '../logic/ledgerLogic'
 import { formatIndianNumber } from '../logic/formatIndianNumber'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { getAntaryatra } from '../db/db'
+import { shouldShowReminder, canRecord } from '../logic/antaryatraLogic'
+import AntaryatraPage from './AntaryatraPage'
 
 const today = getLocalToday()
 
@@ -271,7 +274,19 @@ async function handleUpdate() {
   )
 }
 
-function YearGroup({ yearData, isOpen, onToggle, onUpdate, expandedDate, onRowToggle }) {
+function YearGroup({ yearData, isOpen, onToggle, onUpdate, expandedDate, onRowToggle, allEntries }) {
+  const [antaryatraRecord, setAntaryatraRecord] = useState(null)
+  const [showAntaryatra, setShowAntaryatra] = useState(false)
+  const longPressTimer = useRef(null)
+  const isLongPress = useRef(false)
+
+  useEffect(() => {
+    async function loadRecord() {
+      const rec = await getAntaryatra(yearData.year)
+      setAntaryatraRecord(rec)
+    }
+    loadRecord()
+  }, [yearData.year])
   return (
     <div style={{
       marginBottom: 'var(--spacing-sm)',
@@ -281,7 +296,33 @@ function YearGroup({ yearData, isOpen, onToggle, onUpdate, expandedDate, onRowTo
     }}>
       {/* Year Header */}
       <div
-        onClick={() => onToggle(yearData.year)}
+        onMouseDown={() => {
+          isLongPress.current = false
+          longPressTimer.current = setTimeout(() => {
+            isLongPress.current = true
+            setShowAntaryatra(true)
+          }, 800)
+        }}
+        onMouseUp={() => {
+          clearTimeout(longPressTimer.current)
+          if (!isLongPress.current) onToggle(yearData.year)
+        }}
+        onMouseLeave={() => clearTimeout(longPressTimer.current)}
+        onTouchStart={() => {
+          isLongPress.current = false
+          longPressTimer.current = setTimeout(() => {
+            isLongPress.current = true
+            setShowAntaryatra(true)
+          }, 800)
+        }}
+        onTouchEnd={e => {
+          clearTimeout(longPressTimer.current)
+          if (!isLongPress.current) {
+            onToggle(yearData.year)
+          } else {
+            e.preventDefault()
+          }
+        }}
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -320,6 +361,39 @@ function YearGroup({ yearData, isOpen, onToggle, onUpdate, expandedDate, onRowTo
           {formatIndianNumber(yearData.yearTotal)}
         </span>
       </div>
+
+      {/* Antaryātrā reminder */}
+      {shouldShowReminder(antaryatraRecord, yearData.year) && (
+        <div
+          onClick={() => setShowAntaryatra(true)}
+          style={{
+            fontSize: '0.72rem',
+            color: 'var(--color-gold)',
+            fontStyle: 'italic',
+            letterSpacing: '0.04em',
+            padding: '6px 16px',
+            cursor: 'pointer',
+            background: 'rgba(201,168,76,0.06)',
+            borderBottom: '1px solid var(--color-border)'
+          }}
+        >
+          Reflect on {yearData.year} →
+        </div>
+      )}
+
+      {/* Antaryātrā full-screen page */}
+      {showAntaryatra && (
+        <AntaryatraPage
+          year={yearData.year}
+          record={antaryatraRecord}
+          allEntries={allEntries}
+          onClose={() => setShowAntaryatra(false)}
+          onSaved={async () => {
+            const updated = await getAntaryatra(yearData.year)
+            setAntaryatraRecord(updated)
+          }}
+        />
+      )}
 
       {/* Entries */}
       {isOpen && (
@@ -404,6 +478,7 @@ export default function Ledger({ entries, onUpdate }) {
           onUpdate={onUpdate}
           expandedDate={expandedDate}
           onRowToggle={toggleRow}
+          allEntries={entries}
         />
       ))}
     </div>

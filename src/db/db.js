@@ -1,5 +1,5 @@
 const DB_NAME = 'jaap-ledger-db'
-const DB_VERSION = 2
+const DB_VERSION = 3
 const STORE_NAME = 'entries'
 
 function openDB() {
@@ -19,9 +19,12 @@ function openDB() {
         store.createIndex('date', 'date', { unique: true })
       }
 
-      // Create sankalpa store (version 2)
+      // Create sankalpa and antaryatra store (version 2 and 3)
       if (oldVersion < 2 && !db.objectStoreNames.contains('sankalpa')) {
         db.createObjectStore('sankalpa', { keyPath: 'id' })
+      }
+      if (oldVersion < 3 && !db.objectStoreNames.contains('antaryatra')) {
+        db.createObjectStore('antaryatra', { keyPath: 'year' })
       }
     }
   })
@@ -103,6 +106,39 @@ export async function saveSankalpa(sankalpa) {
     const store = tx.objectStore('sankalpa')
     const req = store.put({ ...sankalpa, id: 'primary' })
     req.onsuccess = () => resolve()
+    req.onerror = () => reject(req.error)
+  })
+}
+
+export async function getAntaryatra(year) {
+  const db = await openDB()
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('antaryatra', 'readonly')
+    const store = tx.objectStore('antaryatra')
+    const req = store.get(year)
+    req.onsuccess = () => resolve(req.result || null)
+    req.onerror = () => reject(req.error)
+  })
+}
+
+export async function saveAntaryatra(record) {
+  const db = await openDB()
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('antaryatra', 'readwrite')
+    const store = tx.objectStore('antaryatra')
+    const req = store.put(record)
+    req.onsuccess = () => resolve()
+    req.onerror = () => reject(req.error)
+  })
+}
+
+export async function getAllAntaryatra() {
+  const db = await openDB()
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction('antaryatra', 'readonly')
+    const store = tx.objectStore('antaryatra')
+    const req = store.getAll()
+    req.onsuccess = () => resolve(req.result || [])
     req.onerror = () => reject(req.error)
   })
 }
