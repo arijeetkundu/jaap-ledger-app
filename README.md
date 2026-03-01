@@ -14,6 +14,8 @@
 - **Milestones** — Every Crore (1,00,00,000) is celebrated with the date achieved and days since the previous milestone.
 - **Prediction** — Based on your 30-day average, Sumiran predicts when you'll reach your next Crore.
 - **Sankalpa Layer** — A single, sacred, immutable record of the intent with which your sādhanā began. Not a goal. A remembrance.
+- **Antaryātrā** — A once-a-year reflective practice. On the last day of each year, a quiet invitation appears to record your inner journey. The window stays open for 14 days.
+- **Antaryātrā Archive** — A silent, read-only record of all past annual reflections, with days of practice and average per day for each year.
 - **Import** — Bring in years of past data from a JSON or CSV file.
 - **Export** — Download your complete data as JSON or CSV backup anytime.
 - **Colour Palettes** — Three devotional themes: Midnight Sanctum, Sacred Saffron, Forest Ashram.
@@ -22,21 +24,37 @@
 
 ---
 
+## 🕯️ The Three Layers
+
+> *Most apps track what you did. Sumiran also preserves why you began — and what each year held.*
+
+| Layer | What it holds |
+|---|---|
+| **Sankalpa** | Why you began — a vow of intent, set once, enduring always |
+| **Ledger** | What you did — every day, every count, every year |
+| **Antaryātrā** | What the year held — a once-a-year reflection, sealed and silent |
+
+---
+
 ## 🕯️ Sankalpa Layer
 
-> *Ledgers count effort. Sankalpa anchors intent.*
+The Sankalpa Layer is a single sacred record — set once, enduring always — that lives quietly behind the ledger. It records your vow of intent, an optional context (Guru, Devatā, occasion), and the date of establishment.
 
-Most spiritual apps track what you did. Sumiran also preserves why you began.
+It is not shown loudly. It does not alter any count. Changing it requires deliberate confirmation — a moment of pause that mirrors the gravity of rewriting a vow.
 
-The Sankalpa Layer is a single sacred record — set once, enduring always — that lives quietly behind the ledger. It records:
+---
 
-- **Sankalpa text** — your vow of intent, in your own words
-- **Context** — Guru, Devatā, or occasion (optional)
-- **Date of Sankalpa** — automatically recorded, never editable
+## 🚶 Antaryātrā
 
-It is not shown loudly. It does not alter any count or progress bar. It simply holds the foundation of your practice — the way a monastery keeps its founding vow, or a lineage preserves its initiation records.
+Antaryātrā (अन्तर्यात्रा) means the inner journey. It is a once-a-year reflective practice — not analytics, not tracking, but स्मृति (smṛti): remembrance and integration.
 
-Changing a Sankalpa requires deliberate confirmation — a moment of pause that mirrors the gravity of rewriting a vow.
+**How it works:**
+- On 31 December of each year, a subtle "Reflect on [year] →" reminder appears under the year header in the Ledger
+- Long-pressing the year header (or clicking on mobile) opens the Antaryātrā page
+- The reflection window stays open for 14 days (until 13 January)
+- Once recorded, the reflection is sealed — it cannot be edited
+- If skipped or expired, no further prompts are shown
+- All past reflections are accessible in the Antaryātrā Archive (Settings)
 
 ---
 
@@ -69,9 +87,9 @@ Sumiran is a PWA — it can be installed on any device like a native app.
 | Layer | Technology |
 |---|---|
 | Framework | React + Vite |
-| Database | IndexedDB v2 (entries + sankalpa stores) |
+| Database | IndexedDB v3 (entries + sankalpa + antaryatra stores) |
 | PWA | vite-plugin-pwa + Workbox |
-| Unit Testing | Vitest + React Testing Library |
+| Unit Testing | Vitest |
 | E2E Testing | Playwright |
 | Styling | Pure CSS with CSS Variables |
 | Fonts | Playfair Display + Inter (Google Fonts) |
@@ -88,41 +106,25 @@ Sumiran is a PWA — it can be installed on any device like a native app.
 ### Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/arijeetkundu/jaap-ledger-app.git
 cd jaap-ledger-app
-
-# Install dependencies
 npm install
-
-# Install Playwright browsers (for E2E tests)
 npx playwright install
 ```
 
 ### Development
 
 ```bash
-# Start dev server
 npm run dev
-
-# Run on local network (for mobile testing)
-npm run dev -- --host
+npm run dev -- --host   # expose on local network for mobile testing
 ```
 
 ### Testing
 
 ```bash
-# Run unit tests
-npm test
-
-# Run unit tests in watch mode
-npm run test:watch
-
-# Run E2E tests
-npm run test:e2e
-
-# Run E2E tests with UI
-npm run test:e2e:ui
+npm test                # unit tests
+npm run test:watch      # watch mode
+npm run test:e2e        # E2E tests
 ```
 
 ### Production Build
@@ -139,29 +141,32 @@ npm run preview
 ```
 sumiran/
 ├── public/
-│   ├── deity.png                    # Splash screen deity image
-│   ├── icons/                       # PWA icons
-│   └── bg-*.png                     # Background patterns per palette
+│   ├── deity.png                        # Splash screen deity image
+│   ├── icons/                           # PWA icons
+│   └── bg-*.png                         # Background patterns per palette
 ├── src/
 │   ├── components/
-│   │   ├── TodayCard.jsx            # Daily entry form
-│   │   ├── ReflectionCard.jsx       # Lifetime stats & milestones
-│   │   ├── Ledger.jsx               # Historical entries
-│   │   ├── SplashScreen.jsx         # App launch screen
-│   │   ├── SettingsPanel.jsx        # Import, export, palette, sankalpa entry
-│   │   └── SankalpePage.jsx         # Sacred Sankalpa full-screen page
+│   │   ├── TodayCard.jsx                # Daily entry form
+│   │   ├── ReflectionCard.jsx           # Lifetime stats & milestones
+│   │   ├── Ledger.jsx                   # Historical entries + Antaryātrā trigger
+│   │   ├── SplashScreen.jsx             # App launch screen
+│   │   ├── SettingsPanel.jsx            # Import, export, palette, Sankalpa, Archive
+│   │   ├── SankalpePage.jsx             # Sacred Sankalpa full-screen page
+│   │   ├── AntaryatraPage.jsx           # Annual reflection page (record & view)
+│   │   └── AntaryatraArchivePage.jsx    # Archive of all past reflections
 │   ├── logic/
-│   │   ├── formatIndianNumber.js    # Indian number formatting
-│   │   ├── milestoneLogic.js        # Crore milestones & prediction
-│   │   ├── ledgerLogic.js           # Date filling, Sunday detection
-│   │   └── palette.js               # Colour palette management
+│   │   ├── formatIndianNumber.js        # Indian number formatting
+│   │   ├── milestoneLogic.js            # Crore milestones & prediction
+│   │   ├── ledgerLogic.js               # Date filling, Sunday detection
+│   │   ├── antaryatraLogic.js           # Window logic, status, stats
+│   │   └── palette.js                   # Colour palette management
 │   ├── db/
-│   │   └── db.js                    # IndexedDB service (v2)
+│   │   └── db.js                        # IndexedDB service (v3)
 │   └── tests/
-│       ├── unit/                    # Vitest unit tests (36 tests)
-│       └── e2e/                     # Playwright E2E tests (21 tests)
-├── vite.config.js                   # Vite + PWA + Vitest config
-└── playwright.config.js             # Playwright config
+│       ├── unit/                        # Vitest unit tests (58 tests)
+│       └── e2e/                         # Playwright E2E tests (21 tests)
+├── vite.config.js
+└── playwright.config.js
 ```
 
 ---
@@ -169,57 +174,39 @@ sumiran/
 ## 🧪 Test Coverage
 
 ```
-Unit Tests      36 passing  ✅
+Unit Tests      58 passing  ✅
 E2E Tests       21 passing  ✅
 ─────────────────────────────
-Total           57 passing  ✅
+Total           79 passing  ✅
 ```
 
-Tests cover:
-- Indian number formatting (7 tests)
-- Milestone logic — brackets, progress, history, prediction (14 tests)
-- Ledger logic — date filling, Sunday detection, year grouping (15 tests)
-- App load and navigation (3 tests)
-- Today Card save and pre-populate (2 tests)
-- Settings — open, export, palette, close (4 tests)
-- Ledger — year display, TODAY badge, Sunday colours (3 tests)
-- Palette — change and persist (2 tests)
-- Sankalpa — open, intro text, establish, read-only, rewrite warning, back navigation (7 tests)
+Antaryātrā logic tests cover:
+- Reflection window open/closed boundaries (Dec 31, Jan 5, Jan 13, Jan 14)
+- Expiry detection
+- Effective status for all four states (pending, recorded, skipped, expired)
+- Reminder visibility logic
+- Year stats calculation (days of practice, average per day)
 
 ---
 
 ## 📖 Data Format
 
 ### Import JSON Format
-Sumiran accepts JSON files in the following format:
-
 ```json
 [
-  {
-    "date": "2023-04-14",
-    "jaap": 20000,
-    "notes": ""
-  },
-  {
-    "date": "2023-04-15",
-    "jaap": 20000,
-    "notes": "Good session"
-  }
+  { "date": "2023-04-14", "jaap": 20000, "notes": "" },
+  { "date": "2023-04-15", "jaap": 20000, "notes": "Good session" }
 ]
 ```
 
-### Export Format
-Exports include all entries with `date`, `count`, `notes` and `updatedAt` fields.
-
-### Sankalpa Record
-Stored internally in IndexedDB under key `primary` in the `sankalpa` store:
+### Antaryātrā Record Schema
 ```json
 {
-  "id": "primary",
-  "text": "May every jaap be offered at the feet of Śrī Rāma...",
-  "context": "Hanumān-ji, Guru Kripā",
-  "date": "2026-03-01",
-  "updatedAt": "2026-03-01"
+  "year": 2025,
+  "status": "recorded",
+  "text": "This was the year I learned that consistency matters more than count.",
+  "recordedOn": "2025-12-31",
+  "timezone": "Asia/Kolkata"
 }
 ```
 
@@ -229,9 +216,9 @@ Stored internally in IndexedDB under key `primary` in the `sankalpa` store:
 
 | Palette | Background | Accent | Description |
 |---|---|---|---|
-| Midnight Sanctum | #0B1628 (Deep Navy) | #C9A84C (Gold) | Default — serene and grounding |
-| Sacred Saffron | #1A0A0A (Deep Burgundy) | #E8820A (Saffron) | Warm and fiery devotion |
-| Forest Ashram | #0A1A0F (Deep Forest) | #B8A830 (Warm Gold) | Calm and earthy stillness |
+| Midnight Sanctum | #0B1628 | #C9A84C | Default — serene and grounding |
+| Sacred Saffron | #1A0A0A | #E8820A | Warm and fiery devotion |
+| Forest Ashram | #0A1A0F | #B8A830 | Calm and earthy stillness |
 
 ---
 
@@ -241,9 +228,8 @@ This app is built with love for the sadhak community. Contributions, suggestions
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/my-feature`)
-3. Commit your changes (`git commit -m 'Add my feature'`)
-4. Push to the branch (`git push origin feature/my-feature`)
-5. Open a Pull Request
+3. Commit your changes
+4. Push and open a Pull Request
 
 ---
 
