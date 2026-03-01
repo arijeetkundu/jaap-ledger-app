@@ -35,7 +35,7 @@ function LedgerRow({ entry, isExpanded, onToggle, onUpdate }) {
   const expandable = editable || viewable
   const isEmpty = entry.isEmpty || entry.count === 0
 
-async function handleUpdate() {
+  async function handleUpdate() {
     try {
       await saveEntry({
         date: entry.date,
@@ -297,32 +297,46 @@ function YearGroup({ yearData, isOpen, onToggle, onUpdate, expandedDate, onRowTo
       {/* Year Header */}
       <div
         onMouseDown={() => {
-          isLongPress.current = false
+          isLongPress.current = false;
           longPressTimer.current = setTimeout(() => {
-            isLongPress.current = true
-            setShowAntaryatra(true)
-          }, 800)
+            isLongPress.current = true;
+            if (canRecord(antaryatraRecord, yearData.year)) {
+              setShowAntaryatra(true);
+            }
+          }, 800);
         }}
         onMouseUp={() => {
-          clearTimeout(longPressTimer.current)
-          if (!isLongPress.current) onToggle(yearData.year)
+          clearTimeout(longPressTimer.current);
+          if (!isLongPress.current) onToggle(yearData.year);
+          isLongPress.current = false;
         }}
-        onMouseLeave={() => clearTimeout(longPressTimer.current)}
-        onTouchStart={() => {
-          isLongPress.current = false
+        onMouseLeave={() => {
+          clearTimeout(longPressTimer.current);
+          isLongPress.current = false;
+        }}
+        // MOBILE FIXES START HERE
+        onTouchStart={(e) => {
+          // Prevent the default browser behavior like scrolling/zooming during the long press
+          isLongPress.current = false;
           longPressTimer.current = setTimeout(() => {
-            isLongPress.current = true
-            setShowAntaryatra(true)
-          }, 800)
+            isLongPress.current = true;
+            if (canRecord(antaryatraRecord, yearData.year)) {
+              setShowAntaryatra(true);
+            }
+          }, 800);
         }}
-        onTouchEnd={e => {
-          clearTimeout(longPressTimer.current)
+        onTouchEnd={(e) => {
+          clearTimeout(longPressTimer.current);
           if (!isLongPress.current) {
-            onToggle(yearData.year)
-          } else {
-            e.preventDefault()
+            // If it wasn't a long press, trigger the toggle
+            onToggle(yearData.year);
           }
+          // This prevents the "mouse" events from firing immediately after touch
+          if (e.cancelable) e.preventDefault();
+          isLongPress.current = false;
         }}
+        // Crucial for mobile: prevents the system context menu from appearing on long-press
+        onContextMenu={(e) => e.preventDefault()}
         style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -330,7 +344,8 @@ function YearGroup({ yearData, isOpen, onToggle, onUpdate, expandedDate, onRowTo
           padding: 'var(--spacing-md)',
           background: 'var(--color-gold-track)',
           cursor: 'pointer',
-          userSelect: 'none'
+          userSelect: 'none',
+          WebkitTouchCallout: 'none' // Disables the callout on iOS
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -387,7 +402,10 @@ function YearGroup({ yearData, isOpen, onToggle, onUpdate, expandedDate, onRowTo
           year={yearData.year}
           record={antaryatraRecord}
           allEntries={allEntries}
-          onClose={() => setShowAntaryatra(false)}
+          onClose={() => {
+            isLongPress.current = false
+            setShowAntaryatra(false)
+          }}
           onSaved={async () => {
             const updated = await getAntaryatra(yearData.year)
             setAntaryatraRecord(updated)
