@@ -16,6 +16,11 @@ function isWithinSevenDays(dateStr) {
   return diffDays >= 0 && diffDays <= 7
 }
 
+function isPoornima(notes) {
+  if (!notes) return false
+  return /poornima|purnima|पूर्णिमा/i.test(notes)
+}
+
 function LedgerRow({ entry, isExpanded, onToggle, onUpdate }) {
   const [count, setCount] = useState(
     entry.count > 0 ? String(entry.count) : ''
@@ -109,11 +114,13 @@ function LedgerRow({ entry, isExpanded, onToggle, onUpdate }) {
             : entry.date === today
               ? 'var(--color-text-primary)'
               : 'var(--color-text-primary)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6
         }}>
           {formatDate(entry.date)}
           {entry.date === today && (
             <span style={{
-              marginLeft: 8,
               fontSize: '0.7rem',
               color: 'var(--color-gold)',
               fontWeight: '600',
@@ -122,6 +129,9 @@ function LedgerRow({ entry, isExpanded, onToggle, onUpdate }) {
             }}>
               Today
             </span>
+          )}
+          {isPoornima(entry.notes) && (
+            <span style={{ fontSize: '1rem' }}>🌕</span>
           )}
         </div>
 
