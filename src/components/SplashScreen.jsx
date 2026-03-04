@@ -4,16 +4,16 @@ export default function SplashScreen({ onComplete }) {
   const [phase, setPhase] = useState('visible') // visible → fading → done
 
   useEffect(() => {
-    // Start fade after 2 seconds
+    // Start fade after 3 seconds
     const fadeTimer = setTimeout(() => {
       setPhase('fading')
-    }, 2000)
+    }, 3000)
 
     // Complete after fade animation (2s + 0.8s fade)
     const doneTimer = setTimeout(() => {
       setPhase('done')
       if (onComplete) onComplete()
-    }, 2800)
+    }, 3800)
 
     return () => {
       clearTimeout(fadeTimer)
@@ -39,6 +39,17 @@ export default function SplashScreen({ onComplete }) {
       pointerEvents: phase === 'fading' ? 'none' : 'all'
     }}>
 
+    <style>{`
+        @keyframes rotateSunburst {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 0.8; }
+          50%       { transform: scale(1.08); opacity: 1; }
+        }
+      `}</style>  
+
       {/* Deity Image with golden glow */}
       <div style={{
         position: 'relative',
@@ -46,14 +57,72 @@ export default function SplashScreen({ onComplete }) {
         alignItems: 'center',
         justifyContent: 'center',
       }}>
+        {/* Sunburst rays — brilliant tapered prabhāvali */}
+        <svg
+          style={{
+            position: 'absolute',
+            width: 420,
+            height: 420,
+            animation: 'rotateSunburst 12s linear infinite',
+            zIndex: 0,
+          }}
+          viewBox="0 0 420 420"
+        >
+          <defs>
+            {/* Glow filter for luminous bloom */}
+            <filter id="rayGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="2.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            {/* Radial gradient — bright at base, fades to transparent */}
+            <radialGradient id="rayGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="30%" stopColor="#FFE484" stopOpacity="1" />
+              <stop offset="60%" stopColor="#C9A84C" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#C9A84C" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+
+          {Array.from({ length: 24 }).map((_, i) => {
+            const isMajor = i % 2 === 0
+            const angle = (i * 360) / 24
+            const rad = (angle * Math.PI) / 180
+            const perpRad = rad + Math.PI / 2
+
+            const halfBase = isMajor ? 7 : 3.5
+            const innerR = 128
+            const outerR = isMajor ? 200 : 168
+
+            const bx1 = 210 + innerR * Math.cos(rad) + halfBase * Math.cos(perpRad)
+            const by1 = 210 + innerR * Math.sin(rad) + halfBase * Math.sin(perpRad)
+            const bx2 = 210 + innerR * Math.cos(rad) - halfBase * Math.cos(perpRad)
+            const by2 = 210 + innerR * Math.sin(rad) - halfBase * Math.sin(perpRad)
+            const tx = 210 + outerR * Math.cos(rad)
+            const ty = 210 + outerR * Math.sin(rad)
+
+            return (
+              <g key={i} filter="url(#rayGlow)">
+                <polygon
+                  points={`${bx1},${by1} ${bx2},${by2} ${tx},${ty}`}
+                  fill="url(#rayGrad)"
+                  fillOpacity={isMajor ? 1 : 0.55}
+                />
+              </g>
+            )
+          })}
+        </svg>
         {/* Glow ring */}
         <div style={{
           position: 'absolute',
-          width: 220,
-          height: 220,
+          width: 300,
+          height: 300,
           borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(240,192,64,0.25) 0%, rgba(201,168,76,0.1) 50%, transparent 70%)',
-          animation: 'pulse 2s ease-in-out infinite'
+          background: 'radial-gradient(circle, rgba(240,192,64,0.4) 0%, rgba(201,168,76,0.2) 45%, transparent 70%)',
+          animation: 'pulse 2s ease-in-out infinite',
+          zIndex: 2
         }} />
 
         {/* Deity Image */}
@@ -66,7 +135,7 @@ export default function SplashScreen({ onComplete }) {
             objectFit: 'contain',
             borderRadius: '50%',
             position: 'relative',
-            zIndex: 1,
+            zIndex: 3,
             filter: 'drop-shadow(0 0 24px rgba(240,192,64,0.4))'
           }}
           onError={e => {
