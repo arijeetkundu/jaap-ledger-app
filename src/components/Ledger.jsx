@@ -493,7 +493,7 @@ export default function Ledger({ entries, onUpdate }) {
           Ledger
         </h2>
         <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-          🔴 Sunday &nbsp; ▸ Notes
+          🔴 Sunday &nbsp; ▸ Notes &nbsp; 🌕 Poornima
         </div>
       </div>
 
