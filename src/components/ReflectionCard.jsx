@@ -3,8 +3,16 @@ import {
   getCurrentMilestone,
   getMilestoneProgress,
   getMilestoneHistory,
-  predictNextMilestone
+  predictNextMilestone,
+  predictNextMilestoneYTD
 } from '../logic/milestoneLogic'
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+function formatPredictedDate(isoDate) {
+  const [year, month, day] = isoDate.split('-').map(Number)
+  return `${day} ${MONTHS[month - 1]} ${year}`
+}
 
 export default function ReflectionCard({ entries }) {
   const totalCount = entries.reduce((sum, e) => sum + (e.count || 0), 0)
@@ -19,6 +27,7 @@ export default function ReflectionCard({ entries }) {
   const progress = getMilestoneProgress(totalCount)
   const history = getMilestoneHistory(entries.slice().reverse())
   const prediction = predictNextMilestone(totalCount, entries.slice().reverse())
+  const ytdPrediction = predictNextMilestoneYTD(totalCount, entries, currentYear)
 
   return (
     <div className="card animate-in" style={{
@@ -99,15 +108,21 @@ export default function ReflectionCard({ entries }) {
           padding: 'var(--spacing-md)',
           background: 'var(--color-gold-track)',
           borderRadius: 'var(--radius-sm)',
-          fontSize: '0.85rem'
+          fontSize: '0.85rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 6
         }}>
-          <div style={{ color: 'var(--color-gold)', fontWeight: '600', marginBottom: 4 }}>
-            Predicted: {prediction.predictedDate}
+          <div style={{ color: 'var(--color-gold)', fontWeight: '600' }}>
+            At current pace (30-day avg: {formatIndianNumber(prediction.averagePerDay)}/day):{' '}
+            {formatPredictedDate(prediction.predictedDate)}
           </div>
-          <div style={{ color: 'var(--color-text-muted)' }}>
-            Based on {prediction.basedOnDays}-day average of{' '}
-            {formatIndianNumber(prediction.averagePerDay)}/day
-          </div>
+          {ytdPrediction && (
+            <div style={{ color: 'var(--color-gold)', fontWeight: '600' }}>
+              At your {currentYear} pace ({formatIndianNumber(ytdPrediction.averagePerDay)}/day YTD):{' '}
+              {formatPredictedDate(ytdPrediction.predictedDate)}
+            </div>
+          )}
         </div>
       )}
 
