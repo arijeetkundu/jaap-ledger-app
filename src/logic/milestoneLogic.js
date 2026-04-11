@@ -49,6 +49,35 @@ export function getMilestoneHistory(entries) {
   return history
 }
 
+export function predictNextMilestoneYTD(totalCount, entries, currentYear) {
+  if (!entries || entries.length === 0) return null
+
+  const yearPrefix = String(currentYear) + '-'
+  const ytdEntries = entries.filter(e => e.date.startsWith(yearPrefix) && e.count > 0)
+
+  if (ytdEntries.length < 30) return null
+
+  const ytdTotal = ytdEntries.reduce((sum, e) => sum + e.count, 0)
+  const averagePerDay = Math.round(ytdTotal / ytdEntries.length)
+
+  if (averagePerDay === 0) return null
+
+  const nextMilestone = (Math.floor(totalCount / CRORE) + 1) * CRORE
+  const remaining = nextMilestone - totalCount
+  const daysRemaining = Math.ceil(remaining / averagePerDay)
+
+  const predictedDate = new Date()
+  predictedDate.setDate(predictedDate.getDate() + daysRemaining)
+  const predictedDateStr = predictedDate.toISOString().split('T')[0]
+
+  return {
+    averagePerDay,
+    daysRemaining,
+    predictedDate: predictedDateStr,
+    basedOnDays: ytdEntries.length
+  }
+}
+
 export function predictNextMilestone(totalCount, entries) {
   if (!entries || entries.length === 0) return null
 

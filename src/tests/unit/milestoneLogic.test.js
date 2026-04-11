@@ -3,7 +3,8 @@ import {
   getCurrentMilestone,
   getMilestoneProgress,
   getMilestoneHistory,
-  predictNextMilestone
+  predictNextMilestone,
+  predictNextMilestoneYTD
 } from '../../logic/milestoneLogic'
 
 // 1 Crore = 10,000,000
@@ -134,6 +135,74 @@ describe('predictNextMilestone', () => {
       count: 0
     }))
     expect(predictNextMilestone(0, entries)).toBeNull()
+  })
+
+})
+
+// ── RP-035: predictNextMilestoneYTD ─────────────────────────────────────────
+// These 6 tests define the contract for the new function.
+// All will fail (Red) until predictNextMilestoneYTD is implemented.
+
+describe('predictNextMilestoneYTD', () => {
+
+  const YEAR = 2026
+
+  it('RP-035 T1 | should return null when there are no current-year entries', () => {
+    // 30 prior-year entries — none in 2026
+    const entries = Array.from({ length: 30 }, (_, i) => ({
+      date: `2025-01-${String(i + 1).padStart(2, '0')}`,
+      count: 50000
+    }))
+    expect(predictNextMilestoneYTD(9000000, entries, YEAR)).toBeNull()
+  })
+
+  it('RP-035 T2 | should return null when fewer than 30 non-zero entries exist in current year (29 entries)', () => {
+    const entries = Array.from({ length: 29 }, (_, i) => ({
+      date: `2026-01-${String(i + 1).padStart(2, '0')}`,
+      count: 50000
+    }))
+    expect(predictNextMilestoneYTD(9000000, entries, YEAR)).toBeNull()
+  })
+
+  it('RP-035 T3 | should return a result when exactly 30 non-zero entries exist in current year', () => {
+    const entries = Array.from({ length: 30 }, (_, i) => ({
+      date: `2026-01-${String(i + 1).padStart(2, '0')}`,
+      count: 50000
+    }))
+    expect(predictNextMilestoneYTD(9000000, entries, YEAR)).not.toBeNull()
+  })
+
+  it('RP-035 T4 | should continue returning a result when 31 entries exist — threshold is a floor not exact', () => {
+    const entries = Array.from({ length: 31 }, (_, i) => ({
+      date: `2026-01-${String(i + 1).padStart(2, '0')}`,
+      count: 50000
+    }))
+    expect(predictNextMilestoneYTD(9000000, entries, YEAR)).not.toBeNull()
+  })
+
+  it('RP-035 T5 | should calculate YTD average as total ÷ non-zero entry count (Method B)', () => {
+    // 30 entries × 51,200 = 1,536,000 ÷ 30 = 51,200/day exactly
+    const entries = Array.from({ length: 30 }, (_, i) => ({
+      date: `2026-01-${String(i + 1).padStart(2, '0')}`,
+      count: 51200
+    }))
+    const result = predictNextMilestoneYTD(9000000, entries, YEAR)
+    expect(result.averagePerDay).toBe(51200)
+  })
+
+  it('RP-035 T6 | should exclude prior-year entries from the YTD average', () => {
+    // 30 prior-year entries × 100,000 + 30 current-year entries × 50,000
+    // YTD avg must be 50,000 — NOT 75,000 (blended) and NOT 100,000 (prior year pace)
+    const priorYear = Array.from({ length: 30 }, (_, i) => ({
+      date: `2025-01-${String(i + 1).padStart(2, '0')}`,
+      count: 100000
+    }))
+    const currentYear = Array.from({ length: 30 }, (_, i) => ({
+      date: `2026-01-${String(i + 1).padStart(2, '0')}`,
+      count: 50000
+    }))
+    const result = predictNextMilestoneYTD(11500000, [...priorYear, ...currentYear], YEAR)
+    expect(result.averagePerDay).toBe(50000)
   })
 
 })
