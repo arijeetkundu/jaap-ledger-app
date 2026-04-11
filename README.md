@@ -12,7 +12,7 @@
 - **Reflection Card** — See your lifetime total, current year total, milestone progress, predicted completion date, and full milestone history.
 - **Ledger** — A complete history of your practice, grouped by year. Sundays highlighted in crimson. Editable within 7 days.
 - **Milestones** — Every Crore (1,00,00,000) is celebrated with the date achieved and days since the previous milestone.
-- **Prediction** — Based on your 30-day average, Sumiran predicts when you'll reach your next Crore.
+- **Prediction** — Two predictions side by side: your **30-day rolling pace** and your **year-to-date (YTD) pace**. The YTD prediction appears once you have 30 or more non-zero entry days in the current calendar year, letting you see both your recent momentum and your annual average at a glance.
 - **Sankalpa Layer** — A single, sacred, immutable record of the intent with which your sādhanā began. Not a goal. A remembrance.
 - **Antaryātrā** — A once-a-year reflective practice. On the last day of each year, a quiet invitation appears to record your inner journey. The window stays open for 14 days.
 - **Antaryātrā Archive** — A silent, read-only record of all past annual reflections, with days of practice and average per day for each year.
@@ -156,15 +156,15 @@ sumiran/
 │   │   └── AntaryatraArchivePage.jsx    # Archive of all past reflections
 │   ├── logic/
 │   │   ├── formatIndianNumber.js        # Indian number formatting
-│   │   ├── milestoneLogic.js            # Crore milestones & prediction
+│   │   ├── milestoneLogic.js            # Crore milestones, 30-day & YTD prediction
 │   │   ├── ledgerLogic.js               # Date filling, Sunday detection
 │   │   ├── antaryatraLogic.js           # Window logic, status, stats
 │   │   └── palette.js                   # Colour palette management
 │   ├── db/
 │   │   └── db.js                        # IndexedDB service (v3)
 │   └── tests/
-│       ├── unit/                        # Vitest unit tests (58 tests)
-│       └── e2e/                         # Playwright E2E tests (21 tests)
+│       ├── unit/                        # Vitest unit tests (64 tests)
+│       └── e2e/                         # Playwright E2E tests (55 tests)
 ├── vite.config.js
 └── playwright.config.js
 ```
@@ -174,18 +174,21 @@ sumiran/
 ## 🧪 Test Coverage
 
 ```
-Unit Tests      58 passing  ✅
-E2E Tests       21 passing  ✅
+Unit Tests      64 passing  ✅
+E2E Tests       55 passing  ✅
 ─────────────────────────────
-Total           79 passing  ✅
+Total          119 passing  ✅
 ```
 
-Antaryātrā logic tests cover:
-- Reflection window open/closed boundaries (Dec 31, Jan 5, Jan 13, Jan 14)
-- Expiry detection
-- Effective status for all four states (pending, recorded, skipped, expired)
-- Reminder visibility logic
-- Year stats calculation (days of practice, average per day)
+Unit test highlights:
+- Antaryātrā logic — reflection window boundaries, expiry, status, year stats
+- Milestone logic — getCurrentMilestone, getMilestoneProgress, getMilestoneHistory, predictNextMilestone, predictNextMilestoneYTD
+- Ledger logic — date filling, Sunday detection
+- Indian number formatting
+
+E2E test highlights:
+- Full Reflection Card YTD prediction suite — 34 tests across Happy Path, BVA, Negative, State, Regression, UI/UX, and Integration types
+- Today Card save, Settings panel, Ledger, Palette, Sankalpa
 
 ---
 
