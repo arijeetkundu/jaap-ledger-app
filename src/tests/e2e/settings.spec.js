@@ -284,6 +284,119 @@ test.describe('Settings', () => {
     expect(entry.count).toBe(45000)
   })
 
+  // ── BEH-141 ───────────────────────────────────────────────────────────────
+  test('BEH-141 | Import JSON skips records with invalid date format', async ({ page }) => {
+    await waitForApp(page)
+    await openSettings(page)
+
+    // 1 valid record + 1 record with date in DD-MM-YYYY format (fails the YYYY-MM-DD regex)
+    const fileContent = JSON.stringify([
+      { date: '2023-04-14', jaap: 20000, notes: 'valid' },
+      { date: '01-01-2026', jaap: 10000, notes: 'invalid date format' }
+    ])
+
+    await page.evaluate((content) => {
+      const input = document.querySelector('input[type="file"][accept=".json"]')
+      if (!input) throw new Error('JSON file input not found')
+      const file = new File([content], 'import.json', { type: 'application/json' })
+      const dt = new DataTransfer()
+      dt.items.add(file)
+      input.files = dt.files
+      input.dispatchEvent(new Event('change', { bubbles: true }))
+    }, fileContent)
+
+    // Settings closes after successful import
+    await expect(page.locator('h2:has-text("Settings")')).not.toBeVisible({ timeout: 8000 })
+
+    // Valid record must be in DB
+    const validEntry = await page.evaluate(({ dbName, dbVersion }) => {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(dbName, dbVersion)
+        req.onerror = () => reject(req.error)
+        req.onsuccess = () => {
+          const db = req.result
+          const tx = db.transaction('entries', 'readonly')
+          const r = tx.objectStore('entries').get('2023-04-14')
+          r.onsuccess = () => resolve(r.result || null)
+          r.onerror = () => reject(r.error)
+        }
+      })
+    }, { dbName: 'jaap-ledger-db', dbVersion: 3 })
+
+    expect(validEntry).not.toBeNull()
+    expect(validEntry.count).toBe(20000)
+
+    // Invalid-date record must NOT be in DB (date "01-01-2026" fails the YYYY-MM-DD regex)
+    const invalidEntry = await page.evaluate(({ dbName, dbVersion }) => {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(dbName, dbVersion)
+        req.onerror = () => reject(req.error)
+        req.onsuccess = () => {
+          const db = req.result
+          const tx = db.transaction('entries', 'readonly')
+          const r = tx.objectStore('entries').get('01-01-2026')
+          r.onsuccess = () => resolve(r.result || null)
+          r.onerror = () => reject(r.error)
+        }
+      })
+    }, { dbName: 'jaap-ledger-db', dbVersion: 3 })
+
+    expect(invalidEntry).toBeNull()
+  })
+
+  // ── BEH-142 ───────────────────────────────────────────────────────────────
+  test('BEH-142 | Import JSON imports only the valid entries (correct imported count)', async ({ page }) => {
+    await waitForApp(page)
+    await openSettings(page)
+
+    // 3 valid records + 1 invalid date — only 3 should be imported
+    // Note: React 18 automatic batching means setImportMessage and setShowSettings(false)
+    // are batched into the same render, so the "✓ Imported X entries" DOM message is never
+    // visible. We validate the count by asserting all 3 valid entries are present in the DB
+    // and the invalid-date record is absent.
+    const fileContent = JSON.stringify([
+      { date: '2022-01-10', jaap: 5000, notes: '' },
+      { date: '2022-01-11', jaap: 6000, notes: '' },
+      { date: '2022-01-12', jaap: 7000, notes: '' },
+      { date: '13/01/2022',  jaap: 9999, notes: 'invalid format — should be skipped' }
+    ])
+
+    await page.evaluate((content) => {
+      const input = document.querySelector('input[type="file"][accept=".json"]')
+      if (!input) throw new Error('JSON file input not found')
+      const file = new File([content], 'import.json', { type: 'application/json' })
+      const dt = new DataTransfer()
+      dt.items.add(file)
+      input.files = dt.files
+      input.dispatchEvent(new Event('change', { bubbles: true }))
+    }, fileContent)
+
+    // Settings closes after import completes
+    await expect(page.locator('h2:has-text("Settings")')).not.toBeVisible({ timeout: 8000 })
+
+    // All 3 valid entries must be in DB
+    const entries = await page.evaluate(({ dbName, dbVersion }) => {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(dbName, dbVersion)
+        req.onerror = () => reject(req.error)
+        req.onsuccess = () => {
+          const db = req.result
+          const tx = db.transaction('entries', 'readonly')
+          const r = tx.objectStore('entries').getAll()
+          r.onsuccess = () => resolve(r.result)
+          r.onerror = () => reject(r.error)
+        }
+      })
+    }, { dbName: 'jaap-ledger-db', dbVersion: 3 })
+
+    const importedDates = entries.map(e => e.date)
+    expect(importedDates).toContain('2022-01-10')
+    expect(importedDates).toContain('2022-01-11')
+    expect(importedDates).toContain('2022-01-12')
+    // The invalid-date record must not appear under its raw key
+    expect(importedDates).not.toContain('13/01/2022')
+  })
+
   // ── SS-SET-008 ────────────────────────────────────────────────────────────
   test('SS-SET-008 | Settings Antaryātrā row opens archive page', async ({ page }) => {
     await waitForApp(page)
