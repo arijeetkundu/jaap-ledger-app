@@ -2,8 +2,13 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// Netlify sets NETLIFY=true automatically during its build.
+// GitHub Actions does not set it, so the GitHub Pages base path is preserved.
+const isNetlify = process.env.NETLIFY === 'true'
+const base = isNetlify ? '/' : '/jaap-ledger-app/'
+
 export default defineConfig({
-  base: '/jaap-ledger-app/',
+  base,
   plugins: [
     react(),
     VitePWA({
@@ -17,8 +22,8 @@ export default defineConfig({
         background_color: '#0B1628',
         display: 'standalone',
         orientation: 'portrait',
-        scope: '/jaap-ledger-app/',
-        start_url: '/jaap-ledger-app/',
+        scope: base,
+        start_url: base,
         icons: [
   {
     src: 'icons/icon-192.png',
