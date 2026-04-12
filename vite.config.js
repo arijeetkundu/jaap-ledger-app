@@ -41,6 +41,8 @@ export default defineConfig({
 ],
       },
       workbox: {
+        skipWaiting: true,      // new SW activates immediately on deploy
+        clientsClaim: true,     // new SW takes control of all tabs immediately
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB limit
         globPatterns: ['**/*.{js,css,html,ico,svg,woff2}'], // removed png
         globIgnores: ['**/bg-*.png'], // explicitly exclude background images
