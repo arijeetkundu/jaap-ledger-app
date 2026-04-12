@@ -69,6 +69,15 @@ async function waitForApp(page) {
   await page.waitForSelector('#jaap-count', { timeout: 8000 })
 }
 
+// ─── Helper: compute a date N days from today as "D MMM YYYY" ────────────────
+// Used instead of hardcoded dates so tests don't break as calendar days advance
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+function daysFromToday(n) {
+  const d = new Date()
+  d.setDate(d.getDate() + n)
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // HAPPY PATH
 // ─────────────────────────────────────────────────────────────────────────────
@@ -98,30 +107,29 @@ test.describe('RP Happy Path', () => {
   test('RP-002 | Primary prediction shows correct label, Indian number format, and D MMM YYYY date', async ({ page }) => {
     await page.goto('/')
     // 30 entries × 50,000 = total 1,500,000; lifetime = 9,950,000; remaining = 50,000
-    // ceil(50,000 ÷ 50,000) = 1 day → predicted = 12 Apr 2026
+    // ceil(50,000 ÷ 50,000) = 1 day → predicted = today + 1
     await seedEntries(page, makeEntries('2026-01-01', 30, 50000))
-    // Seed one prior-year entry so lifetime = 9,950,000 - 1,500,000 + 9,950,000 = works
     await seedEntries(page, [{ date: '2025-01-01', count: 8450000, notes: '', updatedAt: new Date().toISOString() }])
     await waitForApp(page)
 
     const primary = page.locator('text=/At current pace/')
     await expect(primary).toContainText('50,000/day')
-    await expect(primary).toContainText('12 Apr 2026')
-    await expect(primary).not.toContainText('2026-04-12')
+    await expect(primary).toContainText(daysFromToday(1))
+    await expect(primary).not.toContainText(/\d{4}-\d{2}-\d{2}/)
   })
 
   test('RP-003 | YTD prediction shows correct label, Indian number format, and D MMM YYYY date', async ({ page }) => {
     await page.goto('/')
     // 30 entries × 51,200; lifetime = 9,974,800; remaining = 25,200
-    // ceil(25,200 ÷ 51,200) = 1 → predicted = 12 Apr 2026
+    // ceil(25,200 ÷ 51,200) = 1 → predicted = today + 1
     await seedEntries(page, makeEntries('2026-01-01', 30, 51200))
     await seedEntries(page, [{ date: '2025-01-01', count: 8438800, notes: '', updatedAt: new Date().toISOString() }])
     await waitForApp(page)
 
     const ytd = page.locator('text=/At your 2026 pace/')
     await expect(ytd).toContainText('51,200/day')
-    await expect(ytd).toContainText('12 Apr 2026')
-    await expect(ytd).not.toContainText('2026-04-12')
+    await expect(ytd).toContainText(daysFromToday(1))
+    await expect(ytd).not.toContainText(/\d{4}-\d{2}-\d{2}/)
   })
 
   test('RP-004 | YTD average = total YTD count ÷ non-zero entry count (Method B)', async ({ page }) => {
@@ -137,12 +145,12 @@ test.describe('RP Happy Path', () => {
   test('RP-005 | YTD predicted date = today + ceil(remaining ÷ YTD average)', async ({ page }) => {
     await page.goto('/')
     // 30 entries × 51,200; lifetime = 9,488,000; remaining = 512,000
-    // ceil(512,000 ÷ 51,200) = 10 → predicted = 21 Apr 2026
+    // ceil(512,000 ÷ 51,200) = 10 → predicted = today + 10
     await seedEntries(page, makeEntries('2026-01-01', 30, 51200))
     await seedEntries(page, [{ date: '2025-01-01', count: 7952000, notes: '', updatedAt: new Date().toISOString() }])
     await waitForApp(page)
 
-    await expect(page.locator('text=/At your 2026 pace/')).toContainText('21 Apr 2026')
+    await expect(page.locator('text=/At your 2026 pace/')).toContainText(daysFromToday(10))
   })
 
 })
@@ -349,19 +357,20 @@ test.describe('RP State', () => {
   test('RP-019 | YTD average recalculates after a new entry is saved', async ({ page }) => {
     await page.goto('/')
     // 30 entries × 50,000; lifetime = 9,000,000; remaining = 1,000,000
-    // YTD avg = 50,000/day → predicted = 1 May 2026
+    // YTD avg = 50,000/day → ceil(1,000,000 ÷ 50,000) = 20 → predicted = today + 20
     await seedEntries(page, makeEntries('2026-01-01', 30, 50000))
     await seedEntries(page, [{ date: '2025-01-01', count: 7500000, notes: '', updatedAt: new Date().toISOString() }])
     await waitForApp(page)
 
-    await expect(page.locator('text=/At your 2026 pace/')).toContainText('1 May 2026')
+    await expect(page.locator('text=/At your 2026 pace/')).toContainText(daysFromToday(20))
 
-    // Save 80,000 today — raises YTD avg from 50,000 to 50,968; predicted moves to 30 Apr 2026
+    // Save 80,000 today — new total = 1,580,000 ÷ 31 entries = 50,968/day
+    // remaining = 920,000; ceil(920,000 ÷ 50,968) = 19 → predicted = today + 19
     await page.fill('#jaap-count', '80000')
     await page.click('button:has-text("Save")')
     await page.waitForSelector('button:has-text("Saved")')
 
-    await expect(page.locator('text=/At your 2026 pace/')).toContainText('30 Apr 2026')
+    await expect(page.locator('text=/At your 2026 pace/')).toContainText(daysFromToday(19))
   })
 
 })
@@ -470,23 +479,25 @@ test.describe('RP UI/UX', () => {
   test('RP-028 | Primary date displays as D MMM YYYY — not ISO format', async ({ page }) => {
     await page.goto('/')
     // 30 entries × 50,000; lifetime = 9,900,000; remaining = 100,000
-    // ceil(100,000 ÷ 50,000) = 2 → predicted = 13 Apr 2026
+    // ceil(100,000 ÷ 50,000) = 2 → predicted = today + 2
     await seedEntries(page, makeEntries('2026-01-01', 30, 50000))
     await seedEntries(page, [{ date: '2025-01-01', count: 8400000, notes: '', updatedAt: new Date().toISOString() }])
     await waitForApp(page)
 
-    await expect(page.locator('text=/At current pace/')).toContainText('13 Apr 2026')
-    await expect(page.locator('text=/At current pace/')).not.toContainText('2026-04-13')
+    await expect(page.locator('text=/At current pace/')).toContainText(daysFromToday(2))
+    await expect(page.locator('text=/At current pace/')).not.toContainText(/\d{4}-\d{2}-\d{2}/)
   })
 
   test('RP-029 | YTD date displays as D MMM YYYY — not ISO format', async ({ page }) => {
     await page.goto('/')
+    // 30 entries × 50,000; lifetime = 9,900,000; remaining = 100,000
+    // ceil(100,000 ÷ 50,000) = 2 → predicted = today + 2
     await seedEntries(page, makeEntries('2026-01-01', 30, 50000))
     await seedEntries(page, [{ date: '2025-01-01', count: 8400000, notes: '', updatedAt: new Date().toISOString() }])
     await waitForApp(page)
 
-    await expect(page.locator('text=/At your 2026 pace/')).toContainText('13 Apr 2026')
-    await expect(page.locator('text=/At your 2026 pace/')).not.toContainText('2026-04-13')
+    await expect(page.locator('text=/At your 2026 pace/')).toContainText(daysFromToday(2))
+    await expect(page.locator('text=/At your 2026 pace/')).not.toContainText(/\d{4}-\d{2}-\d{2}/)
   })
 
   test('RP-030 | No blank space or empty div when YTD is absent', async ({ page }) => {
@@ -543,20 +554,20 @@ test.describe('RP Integration', () => {
   test('RP-033 | Saving Today Card entry recalculates YTD prediction — without page reload', async ({ page }) => {
     await page.goto('/')
     // 30 entries × 50,000; lifetime = 9,000,000; remaining = 1,000,000
-    // YTD avg = 50,000 → predicted = 1 May 2026
+    // YTD avg = 50,000 → ceil(1,000,000 ÷ 50,000) = 20 → predicted = today + 20
     await seedEntries(page, makeEntries('2026-01-01', 30, 50000))
     await seedEntries(page, [{ date: '2025-01-01', count: 7500000, notes: '', updatedAt: new Date().toISOString() }])
     await waitForApp(page)
 
-    await expect(page.locator('text=/At your 2026 pace/')).toContainText('1 May 2026')
+    await expect(page.locator('text=/At your 2026 pace/')).toContainText(daysFromToday(20))
 
-    // Save 100,000 today → new YTD total = 1,600,000 ÷ 31 = 51,613/day; remaining = 900,000
-    // ceil(900,000 ÷ 51,613) = 18 → predicted = 29 Apr 2026
+    // Save 100,000 today → new YTD total = 1,600,000 ÷ 31 entries = 51,613/day
+    // remaining = 900,000; ceil(900,000 ÷ 51,613) = 18 → predicted = today + 18
     await page.fill('#jaap-count', '100000')
     await page.click('button:has-text("Save")')
     await page.waitForSelector('button:has-text("Saved")')
 
-    await expect(page.locator('text=/At your 2026 pace/')).toContainText('29 Apr 2026')
+    await expect(page.locator('text=/At your 2026 pace/')).toContainText(daysFromToday(18))
   })
 
   test('RP-034 | Prior year entries have zero effect on YTD average', async ({ page }) => {
