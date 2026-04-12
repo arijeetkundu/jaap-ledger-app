@@ -175,9 +175,9 @@ sumiran/
 
 ```
 Unit Tests      94 passing  ✅
-E2E Tests      107 passing  ✅
+E2E Tests      114 passing  ✅
 ─────────────────────────────
-Total          201 passing  ✅
+Total          208 passing  ✅
 ```
 
 Unit test highlights:
