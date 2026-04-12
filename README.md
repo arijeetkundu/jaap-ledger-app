@@ -174,10 +174,10 @@ sumiran/
 ## 🧪 Test Coverage
 
 ```
-Unit Tests      64 passing  ✅
-E2E Tests       55 passing  ✅
+Unit Tests      94 passing  ✅
+E2E Tests      107 passing  ✅
 ─────────────────────────────
-Total          119 passing  ✅
+Total          201 passing  ✅
 ```
 
 Unit test highlights:
@@ -185,10 +185,15 @@ Unit test highlights:
 - Milestone logic — getCurrentMilestone, getMilestoneProgress, getMilestoneHistory, predictNextMilestone, predictNextMilestoneYTD
 - Ledger logic — date filling, Sunday detection
 - Indian number formatting
+- Palette — applyPalette, getSavedPalette
+- DB layer — saveEntry, getAllEntries, deleteEntry
 
 E2E test highlights:
-- Full Reflection Card YTD prediction suite — 34 tests across Happy Path, BVA, Negative, State, Regression, UI/UX, and Integration types
-- Today Card save, Settings panel, Ledger, Palette, Sankalpa
+- Full Reflection Card YTD prediction suite — 35 tests across Happy Path, BVA, Negative, State, Regression, UI/UX, and Integration types
+- Antaryātrā — 22 tests with Playwright clock mocking for Dec 31 flows, Jan 13/14 boundary conditions, mobile touch long-press, and reminder banner
+- Ledger — upsert, sort order, year toggle, Indian number format, dash display, 7-day edit lock, Poornima emoji, notes indicator
+- Settings — export CSV/JSON, import CSV/JSON, backdrop close, archive navigation
+- Splash screen, Today Card, Sankalpa, DB operations
 
 ---
 
