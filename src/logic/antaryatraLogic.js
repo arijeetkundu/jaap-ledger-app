@@ -1,14 +1,5 @@
-// ── DEV ONLY: set to override today's date for testing ──────────────────────
-// Format: new Date(year, monthIndex, day, hour, minute, second)
-// Remove this before merging to main.
-const DEV_DATE_OVERRIDE = null
-//const DEV_DATE_OVERRIDE = new Date(2025, 11, 31, 12, 0, 0) // Dec 31 2025
-//const DEV_DATE_OVERRIDE = new Date(2026, 0, 5, 12, 0, 0)  // Jan 5 2026 (inside window)
-//const DEV_DATE_OVERRIDE = new Date(2026, 0, 13, 22, 0, 0) // Jan 13 2026 (last hour)
-//const DEV_DATE_OVERRIDE = new Date(2026, 0, 14, 1, 0, 0)  // Jan 14 2026 (expired)
-
 function now() {
-  return DEV_DATE_OVERRIDE || new Date()
+  return new Date()
 }
 
 /**

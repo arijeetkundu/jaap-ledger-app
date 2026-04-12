@@ -1,4 +1,3 @@
-import { describe, it, expect } from 'vitest'
 import {
   getCurrentMilestone,
   getMilestoneProgress,
@@ -135,6 +134,70 @@ describe('predictNextMilestone', () => {
       count: 0
     }))
     expect(predictNextMilestone(0, entries)).toBeNull()
+  })
+
+})
+
+// ── BEH-012: getMilestoneHistory — single entry crossing multiple crores ─────
+
+describe('getMilestoneHistory — BEH-012', () => {
+
+  it('BEH-012 | single entry with count=25,000,000 produces 2 history records with correct fields', () => {
+    const entries = [
+      { date: '2024-06-15', count: 25000000 }
+    ]
+    const history = getMilestoneHistory(entries)
+
+    expect(history).toHaveLength(2)
+
+    // First milestone (crore=1): no previous, so daysSincePrevious is null
+    expect(history[0].crore).toBe(1)
+    expect(history[0].date).toBe('2024-06-15')
+    expect(history[0].daysSincePrevious).toBeNull()
+
+    // Second milestone (crore=2): same date as crore=1, so daysSincePrevious=0
+    expect(history[1].crore).toBe(2)
+    expect(history[1].date).toBe('2024-06-15')
+    expect(history[1].daysSincePrevious).toBe(0)
+  })
+
+})
+
+// ── BEH-014: predictNextMilestone — returns null when entries is null ─────────
+
+describe('predictNextMilestone — BEH-014', () => {
+
+  it('BEH-014 | returns null without throwing when entries argument is null', () => {
+    expect(() => predictNextMilestone(0, null)).not.toThrow()
+    expect(predictNextMilestone(0, null)).toBeNull()
+  })
+
+})
+
+// ── BEH-018: predictNextMilestone — predictedDate is YYYY-MM-DD string ───────
+
+describe('predictNextMilestone — BEH-018', () => {
+
+  it('BEH-018 | predictedDate matches YYYY-MM-DD format and does not contain T', () => {
+    const entries = Array.from({ length: 30 }, (_, i) => ({
+      date: `2026-01-${String(i + 1).padStart(2, '0')}`,
+      count: 50000
+    }))
+    const result = predictNextMilestone(0, entries)
+    expect(result).not.toBeNull()
+    expect(result.predictedDate).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+    expect(result.predictedDate).not.toContain('T')
+  })
+
+})
+
+// ── BEH-025: predictNextMilestoneYTD — returns null when entries is null ─────
+
+describe('predictNextMilestoneYTD — BEH-025', () => {
+
+  it('BEH-025 | returns null when entries argument is null', () => {
+    expect(() => predictNextMilestoneYTD(0, null, 2026)).not.toThrow()
+    expect(predictNextMilestoneYTD(0, null, 2026)).toBeNull()
   })
 
 })

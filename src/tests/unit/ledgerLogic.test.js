@@ -1,9 +1,3 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  fillMissingDates,
-  isSunday,
-  groupEntriesByYear
-} from '../../logic/ledgerLogic'
 import {
   fillMissingDates,
   isSunday,
@@ -179,5 +173,35 @@ describe('getLocalToday', () => {
     expect(today.startsWith(String(now.getFullYear()))).toBe(true)
   })
 })
+
+})
+
+// ── BEH-035: fillMissingDates — retains entries older than 7 days ─────────────
+
+describe('fillMissingDates — BEH-035', () => {
+
+  it('BEH-035 | retains an entry from 30 days ago with count and notes intact', () => {
+    const today = '2026-04-11'
+
+    // Entry from 30 days ago (2026-03-12)
+    const oldDate = (() => {
+      const d = new Date(2026, 3, 11) // Apr 11 2026
+      d.setDate(d.getDate() - 30)
+      return d.toISOString().split('T')[0]
+    })()
+
+    const entries = [
+      { date: oldDate, count: 12345, notes: 'Ancient session' },
+      { date: today, count: 67890, notes: 'Today session' }
+    ]
+
+    const result = fillMissingDates(entries, today)
+    const oldEntry = result.find(e => e.date === oldDate)
+
+    expect(oldEntry).toBeDefined()
+    expect(oldEntry.count).toBe(12345)
+    expect(oldEntry.notes).toBe('Ancient session')
+    expect(oldEntry.isEmpty).toBe(false)
+  })
 
 })

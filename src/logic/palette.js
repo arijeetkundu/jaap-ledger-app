@@ -30,7 +30,17 @@ export function savePalette(paletteId) {
   applyPalette(paletteId)
 }
 
+const BG_IMAGES = {
+  'midnight-sanctum': 'bg-midnight-sanctum.png',
+  'sacred-saffron':   'bg-sacred-saffron.png',
+  'forest-ashram':    'bg-forest-ashram.png',
+}
+
 export function applyPalette(paletteId) {
+  const base = import.meta.env.BASE_URL
+  const bgFile = BG_IMAGES[paletteId] || BG_IMAGES['midnight-sanctum']
+  document.documentElement.style.setProperty('--bg-pattern', `url('${base}${bgFile}')`)
+
   if (paletteId === 'midnight-sanctum') {
     document.documentElement.removeAttribute('data-palette')
   } else {

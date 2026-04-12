@@ -43,8 +43,8 @@
   --transition-fast:       0.15s ease;
   --transition-smooth:     0.3s ease;
 
-  /* Background Pattern */
-  --bg-pattern: url('/bg-midnight-sanctum.png');
+  /* Background Pattern — set dynamically by applyPalette() via JS */
+  --bg-pattern: none;
 }
 
 /* ============================================
@@ -68,7 +68,7 @@
   --color-border:          rgba(232, 130, 10, 0.25);
   --color-shadow:          rgba(0, 0, 0, 0.5);
 
-  --bg-pattern:            url('/bg-sacred-saffron.png');
+  /* --bg-pattern set by applyPalette() */
 }
 
 /* ============================================
@@ -92,7 +92,7 @@
   --color-border:          rgba(184, 168, 48, 0.25);
   --color-shadow:          rgba(0, 0, 0, 0.5);
 
-  --bg-pattern:            url('/bg-forest-ashram.png');
+  /* --bg-pattern set by applyPalette() */
 }
 
 /* ============================================

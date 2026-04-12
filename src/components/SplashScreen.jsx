@@ -127,7 +127,7 @@ export default function SplashScreen({ onComplete }) {
 
         {/* Deity Image */}
         <img
-          src="/deity.png"
+          src={import.meta.env.BASE_URL + 'deity.png'}
           alt="deity"
           style={{
             width: 250,
