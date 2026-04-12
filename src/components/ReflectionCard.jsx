@@ -152,7 +152,7 @@ export default function ReflectionCard({ entries }) {
                   {m.crore} Crore
                 </span>
                 <span style={{ color: 'var(--color-text-primary)' }}>
-                  — {m.date}
+                  — {formatPredictedDate(m.date)}
                 </span>
                 {m.daysSincePrevious && (
                   <span style={{
