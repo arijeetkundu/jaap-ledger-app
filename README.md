@@ -18,6 +18,7 @@
 - **Antaryātrā Archive** — A silent, read-only record of all past annual reflections, with days of practice and average per day for each year.
 - **Import** — Bring in years of past data from a JSON or CSV file.
 - **Export** — Download your complete data as JSON or CSV backup anytime.
+- **Sunday Backup Reminder** — Every Sunday, a gentle modal reminds you to back up your ledger to Google Drive. One click signs you in and uploads the file. Dismiss it and it returns next Sunday.
 - **Colour Palettes** — Three devotional themes: Midnight Sanctum, Sacred Saffron, Forest Ashram.
 - **Offline First** — Works completely without internet after first load.
 - **Indian Number Format** — All counts displayed in Indian format (1,00,00,000).
@@ -58,6 +59,29 @@ Antaryātrā (अन्तर्यात्रा) means the inner journey. It 
 
 ---
 
+## ☁️ Sunday Backup Reminder
+
+Every Sunday, when you open Sumiran, a gentle modal appears reminding you to back up your ledger to Google Drive.
+
+**How it works:**
+- Modal appears automatically on Sunday — once per day only, not on every app open
+- Click **Back Up to Google Drive** → Google sign-in popup → backup uploaded as `sumiran-backup.json`
+- Each backup overwrites the previous file — no duplicates
+- Click **Remind me next Sunday** (or × or backdrop) to dismiss — modal will not reappear until next Sunday
+- Your existing **Export as JSON / CSV** buttons in Settings remain unchanged for local downloads
+
+**Privacy:**
+- Each sadhak signs into their **own** Google account — data goes to their own Drive only
+- No data is shared with anyone else
+
+**For fellow sadhaks:**
+The app uses Google OAuth in Testing mode. To enable Drive backup for a sadhak, add their Gmail address as a Test User in the Google Cloud Console.
+
+**iOS PWA note:**
+If the sign-in popup does not appear in the installed PWA, delete the app from the Home Screen, reinstall from Safari, and try again. Alternatively, use the app directly in Safari browser — it always works reliably there.
+
+---
+
 ## 📱 Install as an App
 
 Sumiran is a PWA — it can be installed on any device like a native app.
@@ -94,6 +118,7 @@ Sumiran is a PWA — it can be installed on any device like a native app.
 | Styling | Pure CSS with CSS Variables |
 | Fonts | Playfair Display + Inter (Google Fonts) |
 | Deployment | Netlify (auto-deploy from GitHub) |
+| Drive Backup | Google Drive API + Google Identity Services (OAuth 2.0) |
 
 ---
 
@@ -153,12 +178,15 @@ sumiran/
 │   │   ├── SettingsPanel.jsx            # Import, export, palette, Sankalpa, Archive
 │   │   ├── SankalpePage.jsx             # Sacred Sankalpa full-screen page
 │   │   ├── AntaryatraPage.jsx           # Annual reflection page (record & view)
-│   │   └── AntaryatraArchivePage.jsx    # Archive of all past reflections
+│   │   ├── AntaryatraArchivePage.jsx    # Archive of all past reflections
+│   │   └── BackupReminderModal.jsx      # Sunday Google Drive backup modal
 │   ├── logic/
 │   │   ├── formatIndianNumber.js        # Indian number formatting
 │   │   ├── milestoneLogic.js            # Crore milestones, 30-day & YTD prediction
 │   │   ├── ledgerLogic.js               # Date filling, Sunday detection
 │   │   ├── antaryatraLogic.js           # Window logic, status, stats
+│   │   ├── backupReminder.js            # Sunday detection + reminder tracking
+│   │   ├── driveExport.js               # Google Drive OAuth + upload
 │   │   └── palette.js                   # Colour palette management
 │   ├── db/
 │   │   └── db.js                        # IndexedDB service (v3)
@@ -174,10 +202,10 @@ sumiran/
 ## 🧪 Test Coverage
 
 ```
-Unit Tests      94 passing  ✅
-E2E Tests      114 passing  ✅
-─────────────────────────────
-Total          208 passing  ✅
+Unit Tests      107 passing  ✅
+E2E Tests       124 passing  ✅
+──────────────────────────────
+Total           231 passing  ✅
 ```
 
 Unit test highlights:
@@ -187,10 +215,12 @@ Unit test highlights:
 - Indian number formatting
 - Palette — applyPalette, getSavedPalette
 - DB layer — saveEntry, getAllEntries, deleteEntry
+- Backup reminder — Sunday detection, once-per-Sunday tracking, shouldShow logic
 
 E2E test highlights:
 - Full Reflection Card YTD prediction suite — 35 tests across Happy Path, BVA, Negative, State, Regression, UI/UX, and Integration types
 - Antaryātrā — 22 tests with Playwright clock mocking for Dec 31 flows, Jan 13/14 boundary conditions, mobile touch long-press, and reminder banner
+- Sunday backup reminder — 8 tests covering modal appearance, dismissal flows (button/X/backdrop), same-day suppression, and app usability post-dismiss
 - Ledger — upsert, sort order, year toggle, Indian number format, dash display, 7-day edit lock, Poornima emoji, notes indicator
 - Settings — export CSV/JSON, import CSV/JSON, backdrop close, archive navigation
 - Splash screen, Today Card, Sankalpa, DB operations
