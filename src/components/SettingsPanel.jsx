@@ -1,6 +1,14 @@
 import { useState, useRef } from 'react'
 import { getAllEntries, saveEntry } from '../db/db'
 import { PALETTES, getSavedPalette, savePalette } from '../logic/palette'
+import {
+  signInWithGoogle,
+  exportToDrive,
+  clearDriveAuth,
+  isDriveConnected,
+  getLastExportDate,
+  getDriveUserEmail
+} from '../logic/driveExport'
 import SankalpePage from './SankalpePage'
 import AntaryatraArchivePage from './AntaryatraArchivePage'
 
@@ -10,6 +18,11 @@ export default function SettingsPanel({ onClose, onImportComplete, allEntries })
   const [currentPalette, setCurrentPalette] = useState(getSavedPalette())
   const [showSankalpa, setShowSankalpa] = useState(false)
   const [showArchive, setShowArchive] = useState(false)
+  const [driveConnected, setDriveConnected] = useState(isDriveConnected)
+  const [driveEmail, setDriveEmail] = useState(getDriveUserEmail)
+  const [driveLastExport, setDriveLastExport] = useState(getLastExportDate)
+  const [driveStatus, setDriveStatus] = useState(null) // null | 'uploading' | 'success' | 'error'
+  const [driveMessage, setDriveMessage] = useState('')
   const jsonInputRef = useRef()
   const csvInputRef = useRef()
 
@@ -37,8 +50,20 @@ export default function SettingsPanel({ onClose, onImportComplete, allEntries })
         entries
       }, null, 2)
       downloadFile('jaap-ledger-export.json', data, 'application/json')
+
+      // Also upload to Drive if connected
+      if (isDriveConnected()) {
+        setDriveStatus('uploading')
+        setDriveMessage('Uploading to Google Drive...')
+        await exportToDrive()
+        setDriveLastExport(getLastExportDate())
+        setDriveStatus('success')
+        setDriveMessage('Backed up to Google Drive.')
+      }
     } catch (err) {
       console.error('Export failed:', err)
+      setDriveStatus('error')
+      setDriveMessage('Drive upload failed. Local file was saved.')
     }
   }
 
@@ -50,6 +75,33 @@ export default function SettingsPanel({ onClose, onImportComplete, allEntries })
     a.download = filename
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  // ── GOOGLE DRIVE ────────────────────────────────────
+
+  async function handleDriveConnect() {
+    try {
+      setDriveStatus('uploading')
+      setDriveMessage('Connecting to Google Drive...')
+      await signInWithGoogle()
+      setDriveConnected(true)
+      setDriveEmail(getDriveUserEmail())
+      setDriveStatus('success')
+      setDriveMessage('Connected successfully.')
+    } catch (err) {
+      setDriveStatus('error')
+      setDriveMessage('Could not connect. Please try again.')
+      console.error('Drive connect failed:', err)
+    }
+  }
+
+  function handleDriveDisconnect() {
+    clearDriveAuth()
+    setDriveConnected(false)
+    setDriveEmail(null)
+    setDriveLastExport(null)
+    setDriveStatus(null)
+    setDriveMessage('')
   }
 
   // ── IMPORT ──────────────────────────────────────────
@@ -346,6 +398,107 @@ export default function SettingsPanel({ onClose, onImportComplete, allEntries })
               ⬇ Export as JSON
             </button>
           </div>
+        </div>
+
+        {/* ── GOOGLE DRIVE SECTION ── */}
+        <div style={{ marginBottom: 'var(--spacing-xl)' }}>
+          <div className="card-label" style={{
+            color: 'var(--color-gold)',
+            marginBottom: 'var(--spacing-sm)',
+            fontSize: '0.7rem'
+          }}>
+            Google Drive Backup
+          </div>
+
+          {driveConnected ? (
+            <>
+              <div style={{
+                fontSize: '0.82rem',
+                color: 'var(--color-text-muted)',
+                marginBottom: 'var(--spacing-sm)',
+                lineHeight: 1.6
+              }}>
+                Connected{driveEmail ? ` as ${driveEmail}` : ''}.
+              </div>
+              {driveLastExport && (
+                <div style={{
+                  fontSize: '0.78rem',
+                  color: 'var(--color-text-subtle)',
+                  marginBottom: 'var(--spacing-md)'
+                }}>
+                  Last backup: {new Date(driveLastExport).toLocaleDateString()}
+                </div>
+              )}
+              {driveStatus && (
+                <div style={{
+                  padding: 'var(--spacing-sm) var(--spacing-md)',
+                  borderRadius: 'var(--radius-sm)',
+                  marginBottom: 'var(--spacing-md)',
+                  fontSize: '0.82rem',
+                  background: driveStatus === 'success'
+                    ? 'rgba(201,168,76,0.1)'
+                    : driveStatus === 'error'
+                      ? 'rgba(192,57,43,0.1)'
+                      : 'var(--color-gold-track)',
+                  color: driveStatus === 'success'
+                    ? 'var(--color-gold)'
+                    : driveStatus === 'error'
+                      ? 'var(--color-sunday)'
+                      : 'var(--color-text-muted)',
+                  border: `1px solid ${driveStatus === 'success'
+                    ? 'rgba(201,168,76,0.3)'
+                    : driveStatus === 'error'
+                      ? 'rgba(192,57,43,0.3)'
+                      : 'transparent'}`
+                }}>
+                  {driveMessage}
+                </div>
+              )}
+              <button
+                className="btn btn-primary"
+                onClick={handleDriveDisconnect}
+                style={{
+                  width: '100%',
+                  background: 'var(--color-gold-track)',
+                  color: 'var(--color-text-muted)'
+                }}
+              >
+                Disconnect Google Drive
+              </button>
+            </>
+          ) : (
+            <>
+              <p style={{
+                fontSize: '0.82rem',
+                color: 'var(--color-text-muted)',
+                marginBottom: 'var(--spacing-md)',
+                lineHeight: 1.6
+              }}>
+                Auto-backup your entries to Google Drive every week. Export as JSON will also upload to Drive.
+              </p>
+              {driveStatus === 'error' && (
+                <div style={{
+                  padding: 'var(--spacing-sm) var(--spacing-md)',
+                  borderRadius: 'var(--radius-sm)',
+                  marginBottom: 'var(--spacing-md)',
+                  fontSize: '0.82rem',
+                  background: 'rgba(192,57,43,0.1)',
+                  color: 'var(--color-sunday)',
+                  border: '1px solid rgba(192,57,43,0.3)'
+                }}>
+                  {driveMessage}
+                </div>
+              )}
+              <button
+                className="btn btn-primary"
+                onClick={handleDriveConnect}
+                disabled={driveStatus === 'uploading'}
+                style={{ width: '100%' }}
+              >
+                {driveStatus === 'uploading' ? 'Connecting...' : 'Connect Google Drive'}
+              </button>
+            </>
+          )}
         </div>
 
         {/* Divider */}

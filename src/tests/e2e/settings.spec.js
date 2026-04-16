@@ -416,4 +416,76 @@ test.describe('Settings', () => {
     await expect(page.locator('button:has-text("←")')).toBeVisible({ timeout: 3000 })
   })
 
+  // ── BEH-DR-E01 ───────────────────────────────────────────────────────────
+  test('BEH-DR-E01 | Google Drive Backup section is visible in Settings', async ({ page }) => {
+    await waitForApp(page)
+    await openSettings(page)
+
+    await expect(page.locator('text=Google Drive Backup')).toBeVisible({ timeout: 5000 })
+  })
+
+  // ── BEH-DR-E02 ───────────────────────────────────────────────────────────
+  test('BEH-DR-E02 | Connect Google Drive button is visible when not connected', async ({ page }) => {
+    // Ensure no Drive token in localStorage
+    await page.goto('/')
+    await page.evaluate(() => {
+      localStorage.removeItem('driveAccessToken')
+      localStorage.removeItem('driveTokenExpiry')
+    })
+    await waitForApp(page)
+    await openSettings(page)
+
+    await expect(page.locator('button:has-text("Connect Google Drive")')).toBeVisible({ timeout: 5000 })
+  })
+
+  // ── BEH-DR-E03 ───────────────────────────────────────────────────────────
+  test('BEH-DR-E03 | Connected state renders email and Disconnect button when token is valid', async ({ page }) => {
+    await page.goto('/')
+
+    // Pre-seed localStorage with a valid token and user info
+    await page.evaluate(() => {
+      localStorage.setItem('driveAccessToken', 'fake-test-token')
+      localStorage.setItem('driveTokenExpiry', String(Date.now() + 3600 * 1000))
+      localStorage.setItem('driveUserEmail', 'testuser@gmail.com')
+      localStorage.setItem('driveLastExportDate', new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString())
+    })
+
+    await waitForApp(page)
+    await openSettings(page)
+
+    // Should show connected email
+    await expect(page.locator('text=testuser@gmail.com')).toBeVisible({ timeout: 5000 })
+
+    // Should show Disconnect button
+    await expect(page.locator('button:has-text("Disconnect Google Drive")')).toBeVisible({ timeout: 5000 })
+
+    // Connect button should NOT be visible (exact match to avoid matching "Disconnect Google Drive")
+    await expect(page.getByRole('button', { name: 'Connect Google Drive', exact: true })).not.toBeVisible()
+  })
+
+  // ── BEH-DR-E04 ───────────────────────────────────────────────────────────
+  test('BEH-DR-E04 | Disconnect button clears connection and shows Connect button', async ({ page }) => {
+    await page.goto('/')
+
+    // Pre-seed a connected state
+    await page.evaluate(() => {
+      localStorage.setItem('driveAccessToken', 'fake-test-token')
+      localStorage.setItem('driveTokenExpiry', String(Date.now() + 3600 * 1000))
+      localStorage.setItem('driveUserEmail', 'testuser@gmail.com')
+    })
+
+    await waitForApp(page)
+    await openSettings(page)
+
+    // Click Disconnect
+    await page.click('button:has-text("Disconnect Google Drive")')
+
+    // Should now show Connect button
+    await expect(page.locator('button:has-text("Connect Google Drive")')).toBeVisible({ timeout: 5000 })
+
+    // localStorage should be cleared
+    const token = await page.evaluate(() => localStorage.getItem('driveAccessToken'))
+    expect(token).toBeNull()
+  })
+
 })
