@@ -6,8 +6,10 @@ import ReflectionCard from './components/ReflectionCard'
 import Ledger from './components/Ledger'
 import SplashScreen from './components/SplashScreen'
 import SettingsPanel from './components/SettingsPanel'
+import BackupReminderModal from './components/BackupReminderModal'
 import './App.css'
 import { getSavedPalette, applyPalette } from './logic/palette'
+import { shouldShowBackupReminder } from './logic/backupReminder'
 
 export default function App() {
   const today = getLocalToday()
@@ -15,10 +17,18 @@ export default function App() {
   const [todayEntry, setTodayEntry] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
+  const [showBackupReminder, setShowBackupReminder] = useState(false)
 
   // Apply saved palette on mount
   useEffect(() => {
     applyPalette(getSavedPalette())
+  }, [])
+
+  // Show Sunday backup reminder once per Sunday
+  useEffect(() => {
+    if (shouldShowBackupReminder()) {
+      setShowBackupReminder(true)
+    }
   }, [])
 
   const loadAll = useCallback(async () => {
@@ -69,6 +79,9 @@ export default function App() {
   return (
     <>
       <SplashScreen />
+      {showBackupReminder && (
+        <BackupReminderModal onClose={() => setShowBackupReminder(false)} />
+      )}
       {showSettings && (
         <SettingsPanel
           onClose={() => setShowSettings(false)}
