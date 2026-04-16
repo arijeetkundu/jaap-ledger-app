@@ -18,7 +18,6 @@
 - **Antaryātrā Archive** — A silent, read-only record of all past annual reflections, with days of practice and average per day for each year.
 - **Import** — Bring in years of past data from a JSON or CSV file.
 - **Export** — Download your complete data as JSON or CSV backup anytime.
-- **Google Drive Backup** — Connect your Google account once and your data is automatically backed up to Google Drive every week. Each sadhak backs up to their own Drive. Export as JSON also triggers a Drive upload when connected.
 - **Colour Palettes** — Three devotional themes: Midnight Sanctum, Sacred Saffron, Forest Ashram.
 - **Offline First** — Works completely without internet after first load.
 - **Indian Number Format** — All counts displayed in Indian format (1,00,00,000).
@@ -59,27 +58,6 @@ Antaryātrā (अन्तर्यात्रा) means the inner journey. It 
 
 ---
 
-## ☁️ Google Drive Backup
-
-Sumiran can automatically back up your ledger to your personal Google Drive once a week.
-
-**How it works:**
-- Go to **Settings → Google Drive Backup** and click **Connect Google Drive**
-- Sign in with your Google account — a one-time step
-- From that point on, every time you open the app after 7 or more days since the last backup, it silently uploads `sumiran-backup.json` to your Drive
-- **Export as JSON** also uploads to Drive automatically when connected
-- Each backup overwrites the previous file — no duplicates
-
-**Privacy:**
-- Each sadhak connects their **own** Google account
-- Data goes to **their own** Drive — no one else can see it
-- Disconnecting removes all stored credentials from the device
-
-**For sadhaks using the Netlify app:**
-The app is currently in Google's Testing mode. To enable Drive backup for a fellow sadhak, the developer must add their Gmail address as a Test User in the Google Cloud Console.
-
----
-
 ## 📱 Install as an App
 
 Sumiran is a PWA — it can be installed on any device like a native app.
@@ -116,7 +94,6 @@ Sumiran is a PWA — it can be installed on any device like a native app.
 | Styling | Pure CSS with CSS Variables |
 | Fonts | Playfair Display + Inter (Google Fonts) |
 | Deployment | Netlify (auto-deploy from GitHub) |
-| Drive Backup | Google Drive API + Google Identity Services (OAuth 2.0) |
 
 ---
 
@@ -182,7 +159,6 @@ sumiran/
 │   │   ├── milestoneLogic.js            # Crore milestones, 30-day & YTD prediction
 │   │   ├── ledgerLogic.js               # Date filling, Sunday detection
 │   │   ├── antaryatraLogic.js           # Window logic, status, stats
-│   │   ├── driveExport.js               # Google Drive OAuth + backup logic
 │   │   └── palette.js                   # Colour palette management
 │   ├── db/
 │   │   └── db.js                        # IndexedDB service (v3)
@@ -198,10 +174,10 @@ sumiran/
 ## 🧪 Test Coverage
 
 ```
-Unit Tests      107 passing  ✅
-E2E Tests       120 passing  ✅
-──────────────────────────────
-Total           227 passing  ✅
+Unit Tests      94 passing  ✅
+E2E Tests      114 passing  ✅
+─────────────────────────────
+Total          208 passing  ✅
 ```
 
 Unit test highlights:
@@ -211,13 +187,12 @@ Unit test highlights:
 - Indian number formatting
 - Palette — applyPalette, getSavedPalette
 - DB layer — saveEntry, getAllEntries, deleteEntry
-- Google Drive — token validity, expiry, clearAuth, shouldAutoExport (7-day logic)
 
 E2E test highlights:
 - Full Reflection Card YTD prediction suite — 35 tests across Happy Path, BVA, Negative, State, Regression, UI/UX, and Integration types
 - Antaryātrā — 22 tests with Playwright clock mocking for Dec 31 flows, Jan 13/14 boundary conditions, mobile touch long-press, and reminder banner
 - Ledger — upsert, sort order, year toggle, Indian number format, dash display, 7-day edit lock, Poornima emoji, notes indicator
-- Settings — export CSV/JSON, import CSV/JSON, backdrop close, archive navigation, Google Drive connect/disconnect
+- Settings — export CSV/JSON, import CSV/JSON, backdrop close, archive navigation
 - Splash screen, Today Card, Sankalpa, DB operations
 
 ---

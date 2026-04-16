@@ -8,7 +8,6 @@ import SplashScreen from './components/SplashScreen'
 import SettingsPanel from './components/SettingsPanel'
 import './App.css'
 import { getSavedPalette, applyPalette } from './logic/palette'
-import { shouldAutoExport, exportToDrive } from './logic/driveExport'
 
 export default function App() {
   const today = getLocalToday()
@@ -16,25 +15,10 @@ export default function App() {
   const [todayEntry, setTodayEntry] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
-  const [toast, setToast] = useState(null) // { message, type: 'success' | 'error' }
 
   // Apply saved palette on mount
   useEffect(() => {
     applyPalette(getSavedPalette())
-  }, [])
-
-  // Auto-export to Drive on load if 7+ days have passed
-  useEffect(() => {
-    if (!shouldAutoExport()) return
-    exportToDrive()
-      .then(() => {
-        setToast({ message: 'Weekly backup saved to Google Drive.', type: 'success' })
-        setTimeout(() => setToast(null), 4000)
-      })
-      .catch(() => {
-        setToast({ message: 'Weekly Drive backup failed. Check Settings.', type: 'error' })
-        setTimeout(() => setToast(null), 5000)
-      })
   }, [])
 
   const loadAll = useCallback(async () => {
@@ -85,28 +69,6 @@ export default function App() {
   return (
     <>
       <SplashScreen />
-
-      {/* Drive backup toast */}
-      {toast && (
-        <div style={{
-          position: 'fixed',
-          bottom: 24,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 200,
-          padding: '10px 20px',
-          borderRadius: 'var(--radius-sm)',
-          fontSize: '0.82rem',
-          background: toast.type === 'success' ? 'rgba(201,168,76,0.15)' : 'rgba(192,57,43,0.15)',
-          color: toast.type === 'success' ? 'var(--color-gold)' : 'var(--color-sunday)',
-          border: `1px solid ${toast.type === 'success' ? 'rgba(201,168,76,0.4)' : 'rgba(192,57,43,0.4)'}`,
-          backdropFilter: 'blur(8px)',
-          whiteSpace: 'nowrap'
-        }}>
-          {toast.message}
-        </div>
-      )}
-
       {showSettings && (
         <SettingsPanel
           onClose={() => setShowSettings(false)}
