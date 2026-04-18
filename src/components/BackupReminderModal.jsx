@@ -97,7 +97,7 @@ export default function BackupReminderModal({ onClose }) {
           textAlign: 'center',
           marginBottom: 'var(--spacing-sm)'
         }}>
-          It's Sunday
+          Jai Siya Ram. It is Sunday.
         </h2>
 
         {/* Message */}
@@ -108,7 +108,7 @@ export default function BackupReminderModal({ onClose }) {
           lineHeight: 1.6,
           marginBottom: 'var(--spacing-xl)'
         }}>
-          Time to back up your records for safe-keeping.
+          What has been chanted with devotion, let it be preserved with reverence.
         </p>
 
         {/* Status message */}
