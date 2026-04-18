@@ -78,11 +78,14 @@ export default function BackupReminderModal({ onClose }) {
 
         {/* Icon */}
         <div style={{
-          fontSize: '2rem',
           textAlign: 'center',
           marginBottom: 'var(--spacing-md)'
         }}>
-          🪔
+          <img
+            src={`${import.meta.env.BASE_URL}google-drive.svg`}
+            alt="Google Drive"
+            style={{ width: 40, height: 40 }}
+          />
         </div>
 
         {/* Heading */}
@@ -157,7 +160,7 @@ export default function BackupReminderModal({ onClose }) {
             color: 'var(--color-text-muted)',
             fontSize: '0.82rem',
             cursor: 'pointer',
-            padding: '8px 0',
+            padding: '12px 0',
             textDecoration: 'underline'
           }}
         >
