@@ -31,14 +31,14 @@ test.describe('Sunday Backup Reminder', () => {
   // ── BEH-BR-E01 ───────────────────────────────────────────────────────────
   test('BEH-BR-E01 | Modal appears on Sunday when not yet shown today', async ({ page }) => {
     await loadOnSunday(page)
-    await expect(page.locator('text=It\'s Sunday')).toBeVisible({ timeout: 5000 })
-    await expect(page.locator('text=Time to back up your records for safe-keeping')).toBeVisible()
+    await expect(page.locator('text=Jai Siya Ram. It is Sunday.')).toBeVisible({ timeout: 5000 })
+    await expect(page.locator('text=What has been chanted with devotion')).toBeVisible()
   })
 
   // ── BEH-BR-E02 ───────────────────────────────────────────────────────────
   test('BEH-BR-E02 | Modal does not appear on a weekday', async ({ page }) => {
     await loadOnThursday(page)
-    await expect(page.locator('text=It\'s Sunday')).not.toBeVisible({ timeout: 3000 })
+    await expect(page.locator('text=Jai Siya Ram. It is Sunday.')).not.toBeVisible({ timeout: 3000 })
   })
 
   // ── BEH-BR-E03 ───────────────────────────────────────────────────────────
@@ -50,12 +50,12 @@ test.describe('Sunday Backup Reminder', () => {
   // ── BEH-BR-E04 ───────────────────────────────────────────────────────────
   test('BEH-BR-E04 | "Remind me next Sunday" closes modal and sets localStorage', async ({ page }) => {
     await loadOnSunday(page)
-    await expect(page.locator('text=It\'s Sunday')).toBeVisible({ timeout: 5000 })
+    await expect(page.locator('text=Jai Siya Ram. It is Sunday.')).toBeVisible({ timeout: 5000 })
 
     await page.click('button:has-text("Remind me next Sunday")')
 
     // Modal closes
-    await expect(page.locator('text=It\'s Sunday')).not.toBeVisible({ timeout: 3000 })
+    await expect(page.locator('text=Jai Siya Ram. It is Sunday.')).not.toBeVisible({ timeout: 3000 })
 
     // localStorage is set to today's date
     const stored = await page.evaluate(() => localStorage.getItem('backupReminderLastShown'))
@@ -65,12 +65,12 @@ test.describe('Sunday Backup Reminder', () => {
   // ── BEH-BR-E05 ───────────────────────────────────────────────────────────
   test('BEH-BR-E05 | X button closes modal and sets localStorage', async ({ page }) => {
     await loadOnSunday(page)
-    await expect(page.locator('text=It\'s Sunday')).toBeVisible({ timeout: 5000 })
+    await expect(page.locator('text=Jai Siya Ram. It is Sunday.')).toBeVisible({ timeout: 5000 })
 
     // Click the × close button
     await page.click('button:has-text("×")')
 
-    await expect(page.locator('text=It\'s Sunday')).not.toBeVisible({ timeout: 3000 })
+    await expect(page.locator('text=Jai Siya Ram. It is Sunday.')).not.toBeVisible({ timeout: 3000 })
 
     const stored = await page.evaluate(() => localStorage.getItem('backupReminderLastShown'))
     expect(stored).toBe(SUNDAY_STR)
@@ -79,12 +79,12 @@ test.describe('Sunday Backup Reminder', () => {
   // ── BEH-BR-E06 ───────────────────────────────────────────────────────────
   test('BEH-BR-E06 | Backdrop click closes modal and sets localStorage', async ({ page }) => {
     await loadOnSunday(page)
-    await expect(page.locator('text=It\'s Sunday')).toBeVisible({ timeout: 5000 })
+    await expect(page.locator('text=Jai Siya Ram. It is Sunday.')).toBeVisible({ timeout: 5000 })
 
     // Click the backdrop directly
     await page.locator('[data-testid="backup-backdrop"]').click({ position: { x: 10, y: 10 } })
 
-    await expect(page.locator('text=It\'s Sunday')).not.toBeVisible({ timeout: 3000 })
+    await expect(page.locator('text=Jai Siya Ram. It is Sunday.')).not.toBeVisible({ timeout: 3000 })
 
     const stored = await page.evaluate(() => localStorage.getItem('backupReminderLastShown'))
     expect(stored).toBe(SUNDAY_STR)
@@ -99,7 +99,7 @@ test.describe('Sunday Backup Reminder', () => {
     await page.reload()
     await page.waitForSelector('#jaap-count', { timeout: 8000 })
 
-    await expect(page.locator('text=It\'s Sunday')).not.toBeVisible({ timeout: 3000 })
+    await expect(page.locator('text=Jai Siya Ram. It is Sunday.')).not.toBeVisible({ timeout: 3000 })
   })
 
   // ── BEH-BR-E08 ───────────────────────────────────────────────────────────
