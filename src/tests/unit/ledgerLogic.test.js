@@ -2,7 +2,9 @@ import {
   fillMissingDates,
   isSunday,
   groupEntriesByYear,
-  getLocalToday
+  getLocalToday,
+  isWithinSevenDays,
+  isPoornima
 } from '../../logic/ledgerLogic'
 
 // Helper to get a date string N days ago from a reference date
@@ -202,6 +204,57 @@ describe('fillMissingDates — BEH-035', () => {
     expect(oldEntry.count).toBe(12345)
     expect(oldEntry.notes).toBe('Ancient session')
     expect(oldEntry.isEmpty).toBe(false)
+  })
+
+})
+
+// ── isWithinSevenDays — BEH-209 to BEH-212 ───────────────────────────────────
+
+describe('isWithinSevenDays', () => {
+
+  const TODAY = '2026-04-19'
+
+  it('BEH-209 | returns true for today (diffDays = 0)', () => {
+    expect(isWithinSevenDays(TODAY, TODAY)).toBe(true)
+  })
+
+  it('BEH-210 | returns true for 6 days ago', () => {
+    expect(isWithinSevenDays('2026-04-13', TODAY)).toBe(true)
+  })
+
+  it('BEH-211 | returns false for 8 days ago', () => {
+    expect(isWithinSevenDays('2026-04-11', TODAY)).toBe(false)
+  })
+
+  // Boundary: the function uses diffDays <= 7, so exactly 7 days ago returns TRUE
+  it('BEH-212 | returns true for exactly 7 days ago (boundary: diffDays <= 7)', () => {
+    expect(isWithinSevenDays('2026-04-12', TODAY)).toBe(true)
+  })
+
+})
+
+// ── isPoornima — BEH-213 to BEH-216 ─────────────────────────────────────────
+
+describe('isPoornima', () => {
+
+  it('BEH-213 | returns true for "poornima" (lowercase)', () => {
+    expect(isPoornima('poornima puja today')).toBe(true)
+  })
+
+  it('BEH-213b | returns true for "Poornima" (mixed case — case-insensitive)', () => {
+    expect(isPoornima('Poornima special day')).toBe(true)
+  })
+
+  it('BEH-214 | returns true for "purnima"', () => {
+    expect(isPoornima('purnima vrat')).toBe(true)
+  })
+
+  it('BEH-215 | returns true for Devanagari "पूर्णिमा"', () => {
+    expect(isPoornima('आज पूर्णिमा है')).toBe(true)
+  })
+
+  it('BEH-216 | returns false for empty string notes', () => {
+    expect(isPoornima('')).toBe(false)
   })
 
 })

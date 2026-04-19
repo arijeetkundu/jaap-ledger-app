@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: './src/tests/e2e',
+  globalSetup: './playwright.global-setup.js',
   fullyParallel: false,
   retries: 0,
   workers: 1,
@@ -11,6 +12,7 @@ export default defineConfig({
     headless: true,
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    storageState: 'playwright-storage-state.json',
     // ADD THIS: Helps bypass some restricted shell environments
     launchOptions: {
       args: ['--no-sandbox', '--disable-setuid-sandbox'],

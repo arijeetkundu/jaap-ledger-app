@@ -395,4 +395,40 @@ test.describe('Ledger', () => {
     await expect(page.locator('text=▸').first()).toBeVisible()
   })
 
+  // ── BEH-226 ───────────────────────────────────────────────────────────────
+  test('BEH-226 | Short press (< 800ms) on year header does NOT open AntaryatraPage', async ({ page }) => {
+    const currentYear = new Date().getFullYear()
+
+    await waitForApp(page)
+
+    // Find the year header and perform a short press (mousedown immediately followed by mouseup)
+    await page.evaluate((year) => {
+      const allDivs = document.querySelectorAll('div')
+      for (const div of allDivs) {
+        const style = div.style
+        if (style.userSelect === 'none' || style.cursor === 'pointer') {
+          const spans = div.querySelectorAll('span')
+          for (const span of spans) {
+            if (span.textContent.trim() === String(year)) {
+              // Short press: mousedown + immediate mouseup (< 800ms)
+              div.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+              div.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+              return
+            }
+          }
+        }
+      }
+    }, currentYear)
+
+    // Wait briefly to confirm AntaryatraPage does not appear
+    await page.waitForTimeout(300)
+
+    // AntaryatraPage must NOT appear — it renders a full-screen overlay with year stats
+    // Verify by checking that the Antaryātrā full-screen page is NOT visible
+    await expect(page.locator('text=Days of Practice')).not.toBeVisible({ timeout: 1000 })
+
+    // The ledger year header must still be visible (short press only toggled, did not open page)
+    await expect(page.locator(`text=${currentYear}`).first()).toBeVisible()
+  })
+
 })

@@ -1,5 +1,5 @@
 import { saveEntry } from '../db/db'
-import { isSunday, groupEntriesByYear, getLocalToday } from '../logic/ledgerLogic'
+import { isSunday, groupEntriesByYear, getLocalToday, isWithinSevenDays, isPoornima } from '../logic/ledgerLogic'
 import { formatIndianNumber } from '../logic/formatIndianNumber'
 import { useState, useEffect, useRef } from 'react'
 import { getAntaryatra } from '../db/db'
@@ -7,19 +7,6 @@ import { shouldShowReminder, canRecord } from '../logic/antaryatraLogic'
 import AntaryatraPage from './AntaryatraPage'
 
 const today = getLocalToday()
-
-function isWithinSevenDays(dateStr) {
-  const entryDate = new Date(dateStr)
-  const todayDate = new Date(today)
-  const diffMs = todayDate - entryDate
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
-  return diffDays >= 0 && diffDays <= 7
-}
-
-function isPoornima(notes) {
-  if (!notes) return false
-  return /poornima|purnima|पूर्णिमा/i.test(notes)
-}
 
 function LedgerRow({ entry, isExpanded, onToggle, onUpdate }) {
   const [count, setCount] = useState(
@@ -35,7 +22,7 @@ function LedgerRow({ entry, isExpanded, onToggle, onUpdate }) {
   const [saved, setSaved] = useState(false)
 
   const sunday = isSunday(entry.date)
-  const editable = isWithinSevenDays(entry.date)
+  const editable = isWithinSevenDays(entry.date, today)
   const viewable = !editable && (entry.count > 0 || entry.notes)
   const expandable = editable || viewable
   const isEmpty = entry.isEmpty || entry.count === 0

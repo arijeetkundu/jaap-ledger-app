@@ -113,6 +113,43 @@ test.describe('Sankalpa', () => {
     ).toBeVisible({ timeout: 3000 })
   })
 
+  // ── BEH-260 ───────────────────────────────────────────────────────────────
+  test('BEH-260 | Cancel in rewrite warning dialog returns to view mode — original text still visible', async ({ page }) => {
+    await waitForApp(page)
+    await openSankalpaPage(page)
+
+    const ORIGINAL_TEXT = 'Original sankalpa for cancel test BEH-260'
+
+    // Save a sankalpa first so the rewrite warning can appear
+    await page.locator(SANKALPA_TEXTAREA).fill(ORIGINAL_TEXT)
+    await page.click('button:has-text("Establish Sankalpa")')
+    await expect(page.locator('text=Sankalpa recorded')).toBeVisible({ timeout: 5000 })
+
+    // Trigger the rewrite warning dialog by clicking "Re-affirm Sankalpa"
+    const reaffirmBtn = page.locator('button:has-text("Re-affirm Sankalpa")')
+    await expect(reaffirmBtn).toBeVisible({ timeout: 5000 })
+    await reaffirmBtn.click()
+
+    // Warning dialog must appear
+    await expect(
+      page.locator('text=Rewriting a Sankalpa should be done with care')
+    ).toBeVisible({ timeout: 3000 })
+
+    // Click "Cancel" in the warning dialog
+    await page.locator('button:has-text("Cancel")').click()
+
+    // Warning must disappear
+    await expect(
+      page.locator('text=Rewriting a Sankalpa should be done with care')
+    ).not.toBeVisible({ timeout: 3000 })
+
+    // The edit mode textarea must NOT appear
+    await expect(page.locator(SANKALPA_TEXTAREA)).not.toBeVisible({ timeout: 2000 })
+
+    // The original sankalpa text must still be displayed in view mode
+    await expect(page.locator(`text=${ORIGINAL_TEXT}`)).toBeVisible({ timeout: 3000 })
+  })
+
   // ── SS-SK-003 ─────────────────────────────────────────────────────────────
   test('SS-SK-003 | Rewrite preserves original sankalpa date in IndexedDB', async ({ page }) => {
     await waitForApp(page)

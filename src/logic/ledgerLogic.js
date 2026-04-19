@@ -66,6 +66,19 @@ export function fillMissingDates(entries, today) {
   )
 }
 
+export function isWithinSevenDays(dateStr, today) {
+  const entryDate = new Date(dateStr)
+  const todayDate = new Date(today)
+  const diffMs = todayDate - entryDate
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+  return diffDays >= 0 && diffDays <= 7
+}
+
+export function isPoornima(notes) {
+  if (!notes) return false
+  return /poornima|purnima|पूर्णिमा/i.test(notes)
+}
+
 export function groupEntriesByYear(entries) {
   const yearMap = {}
 
